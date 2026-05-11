@@ -1,4 +1,4 @@
-import { Mango } from "@/lib/type";
+import { Mango, Order } from "@/lib/type";
 
 
 // export const mangoes: Mango[] = [
@@ -282,3 +282,26 @@ export const mangoes: Mango[] = [
     isPopular: true
   }
 ];
+export const mockOrders: Order[] = [
+    {
+      id: 'MS-8241',
+      date: 'মে ১১, ২০২৬',
+      total: 840,
+      status: 'pending',
+      items: [mangoes[0], mangoes[1], mangoes[2]],
+    },
+    {
+      id: 'MS-7129',
+      date: 'মে ০৮, ২০২৬',
+      total: 1250,
+      status: 'processing',
+      items: [mangoes[5], mangoes[4]],
+    },
+    {
+      id: 'MS-6092',
+      date: 'মে ০৫, ২০২৬',
+      total: 450,
+      status: 'delivered',
+      items: [mangoes[3]],
+    }
+  ];

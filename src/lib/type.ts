@@ -9,3 +9,11 @@ export interface Mango {
   category: string;
   isPopular?: boolean;
 }
+
+export interface Order {
+  id: string;
+  date: string;
+  total: number;
+  status: 'pending' | 'processing' | 'delivered';
+  items: Mango[];
+}
