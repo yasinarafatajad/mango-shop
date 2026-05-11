@@ -105,9 +105,9 @@ export default function Cart() {
             </div>
           </div>
 
-          <button className="checkout-btn">
+          <Link href="/checkout" className="checkout-btn">
             চেকআউট করুন <ChevronRight size={20} />
-          </button>
+          </Link>
         </>
       )}
     </div>
