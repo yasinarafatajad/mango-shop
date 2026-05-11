@@ -43,7 +43,7 @@ export default function Checkout() {
     if (isOrdered) {
         return (
             <div className="checkout-page" style={{ textAlign: 'center', paddingTop: '60px' }}>
-                <CheckCircle2 size={80} color="#1B5E20" style={{ marginBottom: '20px' }} />
+                <CheckCircle2 size={80} color="#1B5E20" style={{ margin: '0 auto 10px auto' }} />
                 <h2 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '10px' }}>অর্ডার সফল হয়েছে!</h2>
                 <p style={{ color: '#666', marginBottom: '30px' }}>আপনার অর্ডারটি গ্রহণ করা হয়েছে। শীঘ্রই আমাদের প্রতিনিধি আপনার সাথে যোগাযোগ করবেন।</p>
                 <Link href="/" className="place-order-btn" style={{ textDecoration: 'none', display: 'inline-block', width: 'auto', padding: '16px 40px' }}>
