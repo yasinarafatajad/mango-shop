@@ -43,7 +43,7 @@ export default function MyOrders() {
       ) : (
         <div className="orders-list">
           {mockOrders.map((order) => (
-            <div key={order.id} className="order-card">
+            <Link href={`/my-orders/${order.id}`} key={order.id} className="order-card">
               <div className="order-top">
                 <div>
                   <div className="order-id">অর্ডার #{order.id}</div>
@@ -72,11 +72,8 @@ export default function MyOrders() {
                   <div className="order-total">৳{order.total}</div>
                 </div>
 
-                <Link href={`/my-orders/${order.id}`} className="order-action">
-                  বিস্তারিত <ChevronRight size={16} />
-                </Link>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

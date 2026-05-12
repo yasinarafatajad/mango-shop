@@ -121,11 +121,11 @@
 .action-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 10px;
 }
 
 .add-cart-btn-large {
-  padding: 12px;
+  padding: 8px;
   border: 2px solid var(--primary-green);
   color: var(--primary-green);
   background: var(--white);
@@ -134,11 +134,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 5px;
+  text-wrap: nowrap;
 }
 
 .buy-now-btn-large {
-  padding: 12px;
+  padding: 8px;
   background: var(--primary-orange);
   color: var(--white);
   border-radius: var(--radius-sm);
@@ -146,7 +147,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 5px;
+  text-wrap: nowrap;
   box-shadow: 0 4px 15px rgba(251, 140, 0, 0.3);
 }
 

@@ -55,8 +55,8 @@ export default function Checkout() {
 
     return (
         <div className="checkout-page">
-            <div className="cart-title">
-                <Link href="/cart">
+            <div className="checkout-back">
+                <Link href="/">
                     <ArrowLeft size={24} />
                 </Link>
                 <span>চেকআউট</span>
@@ -104,8 +104,9 @@ export default function Checkout() {
 
                 <div className="payment-grid">
                     {paymentOptions.map((option) => (
-                        <div
+                        <button
                             key={option.id}
+                            type="button"
                             className={`payment-card ${paymentMethod === option.id ? 'active' : ''}`}
                             onClick={() => setPaymentMethod(option.id)}
                         >
@@ -126,7 +127,7 @@ export default function Checkout() {
                                 {option.id.toUpperCase()}
                             </div>
                             <span className="payment-name">{option.name}</span>
-                        </div>
+                        </button>
                     ))}
                 </div>
 

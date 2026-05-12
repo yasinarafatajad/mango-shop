@@ -252,7 +252,7 @@ export const mockOrders: Order[] = [
       date: 'মে ০৮, ২০২৬',
       total: 1250,
       status: 'processing',
-      items: [mangoes[5], mangoes[4]],
+      items: [mangoes[1], mangoes[0], mangoes[5], mangoes[4]],
     },
     {
       id: 'MS-6092',
