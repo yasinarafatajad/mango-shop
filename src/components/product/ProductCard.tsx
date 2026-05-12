@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Plus, Heart } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface ProductCardProps {
   mango: {
@@ -16,30 +17,35 @@ interface ProductCardProps {
 
 export default function ProductCard({ mango }: ProductCardProps) {
   const [isLiked, setIsLiked] = useState(false);
+  const pathname = usePathname();
+  const isWishlistPage = pathname === "/wishlist";
 
   return (
     <div className="product-card group">
       <div className="relative overflow-hidden aspect-square">
         <Link href={`/product/${mango.id}`}>
-          <img 
-            src={mango.image} 
-            alt={mango.nameBn} 
-            className="product-image group-hover:scale-110 transition-transform duration-500" 
+          <img
+            src={mango.image}
+            alt={mango.nameBn}
+            className="product-image group-hover:scale-110 transition-transform duration-500"
           />
         </Link>
-        <button 
-          onClick={(e) => {
-            e.preventDefault();
-            setIsLiked(!isLiked);
-          }}
-          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-sm z-10 hover:scale-110 active:scale-95 transition-transform"
-        >
-          <Heart 
-            size={18} 
-            fill={isLiked ? "#ff4d4d" : "none"} 
-            color={isLiked ? "#ff4d4d" : "#666"} 
-          />
-        </button>
+        {!isWishlistPage && (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              setIsLiked(!isLiked);
+            }}
+            className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-sm z-10 hover:scale-110 active:scale-95 transition-transform"
+          >
+            <Heart
+              size={18}
+              fill={isLiked ? "#ff4d4d" : "none"}
+              color={isLiked ? "#ff4d4d" : "#666"}
+            />
+          </button>
+        )}
+
       </div>
       <div className="product-info">
         <Link href={`/product/${mango.id}`}>

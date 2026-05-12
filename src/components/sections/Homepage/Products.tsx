@@ -1,5 +1,5 @@
 import { mangoes } from "@/lib/data";
-import ProductCard from "../product/ProductCard";
+import ProductCard from "../../product/ProductCard";
 import Link from "next/link";
 
 export default function Products() {

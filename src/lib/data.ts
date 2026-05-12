@@ -1,4 +1,28 @@
-import { Mango, Order } from "@/lib/type";
+import { Mango, Order, User } from "@/lib/type";
+
+export const mockUsers: User[] = [
+  {
+    id: 'u1',
+    name: 'Admin User',
+    email: 'admin@mangoshop.com',
+    phone: '01712345678',
+    role: 'admin',
+    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&h=200&auto=format&fit=crop',
+    address: 'Rajshahi, Bangladesh',
+    joinDate: 'জানুয়ারি ২০২৪'
+  },
+  {
+    id: 'u2',
+    name: 'Yasin Arafat',
+    email: 'yasin@example.com',
+    phone: '01887654321',
+    role: 'customer',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&h=200&auto=format&fit=crop',
+    address: 'Dhaka, Bangladesh',
+    joinDate: 'মার্চ ২০২৬'
+  }
+];
+
 
 
 // export const mangoes: Mango[] = [
