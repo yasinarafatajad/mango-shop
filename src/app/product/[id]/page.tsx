@@ -69,7 +69,7 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
             <button onClick={() => handleQuantityChange(-1)} className="qty-btn-large">
               <Minus size={18} />
             </button>
-            <span className="text-xl font-bold min-w-[24px] text-center">{quantity}</span>
+            <span className="qty-number">{quantity}</span>
             <button onClick={() => handleQuantityChange(1)} className="qty-btn-large">
               <Plus size={18} />
             </button>
@@ -78,12 +78,12 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 
         <div className="action-buttons">
           <button onClick={() => handleAddToCart(mango.id)} className="add-cart-btn-large">
-            <ShoppingCart size={20} />
-            কার্টে যোগ করুন
+            <span><ShoppingCart size={20} /></span>
+            <span>কার্টে যোগ করুন</span>
           </button>
           <Link href="/checkout" className="buy-now-btn-large">
-            <Zap size={20} />
-            এখনই কিনুন
+            <span><Zap size={20} /></span>
+            <span>এখনই কিনুন</span>
           </Link>
         </div>
       </div>
