@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import BottomNav from "@/components/layout/BottomNav";
+import { ReactNode } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,7 +20,11 @@ export const metadata: Metadata = {
   description: "রাজশাহীর সুস্বাদু এবং তাজা আম সরাসরি আপনার দ্বারে।",
 };
 
-export default function RootLayout({ children }) {
+interface RootLayoutProps {
+  children: ReactNode;
+};
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html>
       <body className="app-container pb-24">
