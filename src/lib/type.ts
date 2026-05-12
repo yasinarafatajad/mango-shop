@@ -17,3 +17,14 @@ export interface Order {
   status: 'pending' | 'processing' | 'delivered';
   items: Mango[];
 }
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: 'admin' | 'customer';
+  image: string;
+  address?: string;
+  joinDate: string;
+}
