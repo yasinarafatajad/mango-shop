@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { mangoes, categories } from '../lib/data';
+import { mangoes } from '../lib/data';
 import Header from '../components/layout/Header';
 import BottomNav from '../components/layout/BottomNav';
 import ProductCard from '../components/product/ProductCard';
