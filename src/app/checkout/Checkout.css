@@ -1,7 +1,7 @@
 .checkout-page {
-  display: flex;
+  /* display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: center; */
   gap: 10px;
   padding: 16px;
   animation: animate-in 0.3s ease-out;
@@ -13,6 +13,15 @@
   border-radius: var(--radius-md);
   border: 1px solid #f0f0f0;
   margin-bottom: 20px;
+}
+
+.checkout-back {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .section-title {
@@ -69,6 +78,13 @@
   gap: 8px;
   cursor: pointer;
   transition: 0.2s;
+  background: var(--white);
+  font-family: inherit;
+  width: 100%;
+}
+
+.payment-card:active {
+  transform: scale(0.95);
 }
 
 .payment-card.active {

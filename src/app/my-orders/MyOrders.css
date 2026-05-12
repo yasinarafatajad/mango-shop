@@ -75,6 +75,7 @@
   display: flex;
   gap: 12px;
   align-items: center;
+  justify-content: space-between;
 }
 
 .order-thumbs {
@@ -91,6 +92,7 @@
 }
 
 .order-info {
+  text-align: right;
   flex: 1;
 }
 
