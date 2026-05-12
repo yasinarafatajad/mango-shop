@@ -18,7 +18,7 @@ export default function Header() {
           <div className="logo-wrapper">
             <Leaf className="logo-icon" />
 
-            <h1 className="logo-text">EcoStore</h1>
+            <h1 className="logo-text">MangoShop</h1>
           </div>
 
           {/* Cart */}
@@ -35,7 +35,7 @@ export default function Header() {
 
           <input
             type="text"
-            placeholder="Search eco-friendly products..."
+            placeholder="Search products..."
             className="search-input"
           />
         </div>

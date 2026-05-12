@@ -5,7 +5,7 @@ export default function Hero() {
     <section className="">
         <div className="banner">
           <h2>সেরা আম সরাসরি বাগান থেকে!</h2>
-          <p>এখনই অর্ডার করুন এবং ২০% ছাড় পান।</p>
+          <p>এখনই অর্ডার করুন সেরা অফারে ।</p>
           <div className="banner-img">🥭</div>
         </div>
       </section>
