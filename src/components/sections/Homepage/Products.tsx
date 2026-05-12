@@ -3,6 +3,9 @@ import ProductCard from "../../product/ProductCard";
 import Link from "next/link";
 
 export default function Products() {
+    const totalProducts = 5;
+
+    
     return (
         <section>
             <div className="section-title">
@@ -11,7 +14,7 @@ export default function Products() {
             </div>
 
             <div className="products-grid">
-                {mangoes.slice(0, 6).map((mango) => (
+                {mangoes.slice(0, totalProducts).map((mango) => (
                     <ProductCard key={mango.id} mango={mango} />
                 ))}
             </div>

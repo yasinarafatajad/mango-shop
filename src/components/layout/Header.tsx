@@ -6,6 +6,7 @@ import {
   Leaf,
   ShoppingCart,
   Search,
+  User,
 } from "lucide-react";
 
 export default function Header() {
@@ -21,12 +22,19 @@ export default function Header() {
             <h1 className="logo-text">MangoShop</h1>
           </div>
 
-          {/* Cart */}
-          <Link  href="/cart" className="cart-btn">
-            <ShoppingCart className="cart-icon" />
+          {/* Icons Group */}
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            {/* Login */}
+            <Link href="/login" className="cart-btn" style={{ background: '#f5f5f5', borderRadius: '50%', width: '40px', height: '40px', justifyContent: 'center', alignItems: 'center' }}>
+              <User size={22} color="#666" />
+            </Link>
 
-            <span className="cart-badge">3</span>
-          </Link>
+            {/* Cart */}
+            <Link href="/cart" className="cart-btn">
+              <ShoppingCart className="cart-icon" />
+              <span className="cart-badge">3</span>
+            </Link>
+          </div>
         </div>
 
         {/* Search */}
