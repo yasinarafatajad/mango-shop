@@ -16,8 +16,7 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
   if (!mango) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
-        <h2>আমটি খুঁজে পাওয়া যায়নি</h2>
-        <Link href="/" className="mt-4 text-green-700 font-bold">হোমে ফিরে যান</Link>
+        <h2>পণ্যটি খুঁজে পাওয়া যায়নি</h2>
       </div>
     );
   }
