@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import BottomNav from "@/components/layout/BottomNav";
-import ScrollToTop from "@/components/layout/ScrollToTop";
 import { ReactNode } from "react";
 
 const geistSans = Geist({
@@ -31,7 +30,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body className="app-container pb-24">
         <Header />
         {children}
-        <ScrollToTop />
         <BottomNav />
       </body>
     </html>
