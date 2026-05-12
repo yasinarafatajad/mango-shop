@@ -7,11 +7,11 @@ export default function Products() {
         <section>
             <div className="section-title">
                 <h3>তাজা আম সমূহ</h3>
-                <Link href="#" className="text-primary-orange">সব দেখুন</Link>
+                <Link href="/all-products" className="text-primary-orange">সব দেখুন</Link>
             </div>
 
             <div className="products-grid">
-                {mangoes.map((mango) => (
+                {mangoes.slice(0, 6).map((mango) => (
                     <ProductCard key={mango.id} mango={mango} />
                 ))}
             </div>
