@@ -26,6 +26,15 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
     setQuantity(prev => Math.max(1, prev + delta));
   };
 
+  const handleAddToCart = (id: string) => {
+    console.log(id);
+  };
+  const handleAddToWishlist = (id: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsFavorite(!isFavorite);
+    console.log("wish: ", id);
+  };
+
   return (
     <div className="product-details-page">
       <div className="details-header">
@@ -34,7 +43,7 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
         </Link>
         <button
           className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-md z-10"
-          onClick={() => setIsFavorite(!isFavorite)}
+          onClick={(e) => handleAddToWishlist(mango.id, e)}
         >
           <Heart size={24} fill={isFavorite ? "#ff4d4d" : "none"} color={isFavorite ? "#ff4d4d" : "#1A1A1A"} />
         </button>
@@ -68,7 +77,7 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
         </div>
 
         <div className="action-buttons">
-          <button className="add-cart-btn-large">
+          <button onClick={() => handleAddToCart(mango.id)} className="add-cart-btn-large">
             <ShoppingCart size={20} />
             কার্টে যোগ করুন
           </button>

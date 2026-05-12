@@ -20,6 +20,15 @@ export default function ProductCard({ mango }: ProductCardProps) {
   const pathname = usePathname();
   const isWishlistPage = pathname === "/wishlist";
 
+  const handleAddToCart = (id: string) => {
+    console.log(id);
+  };
+  const handleAddToWishlist = (id: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsLiked(!isLiked);
+    console.log("wish: ", id);
+  };
+
   return (
     <div className="product-card group">
       <div className="relative overflow-hidden aspect-square">
@@ -32,10 +41,7 @@ export default function ProductCard({ mango }: ProductCardProps) {
         </Link>
         {!isWishlistPage && (
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              setIsLiked(!isLiked);
-            }}
+            onClick={(e) => handleAddToWishlist(mango.id, e)}
             className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-sm z-10 hover:scale-110 active:scale-95 transition-transform"
           >
             <Heart
@@ -55,7 +61,7 @@ export default function ProductCard({ mango }: ProductCardProps) {
           <div className="product-price">
             ৳{mango.price} <span className="product-unit">/ {mango.unit}</span>
           </div>
-          <button className="add-btn hover:scale-110 active:scale-95 transition-transform">
+          <button onClick={() => handleAddToCart(mango.id)} className="add-btn hover:scale-110 active:scale-95 transition-transform">
             <Plus size={18} />
           </button>
         </div>
