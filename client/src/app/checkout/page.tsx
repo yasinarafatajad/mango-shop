@@ -9,18 +9,31 @@ import {
     Phone,
     User,
     Hash,
-    CheckCircle2
+    CheckCircle2,
+    Ticket,
+    Truck,
+    AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
-import { createOrder, fetchProducts } from '@/lib/api';
+import { useRouter } from 'next/navigation';
+import { createOrder, applyCoupon as applyCouponApi, fetchActiveDeliveryCharges, uploadImage } from '@/lib/api';
+import { getCart } from '@/lib/storage';
 import './Checkout.css';
 
 export default function Checkout() {
+    const router = useRouter();
     const [paymentMethod, setPaymentMethod] = useState('cod');
     const [isOrdered, setIsOrdered] = useState(false);
     const [screenshot, setScreenshot] = useState<File | null>(null);
     const [isCopied, setIsCopied] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [cartItems, setCartItems] = useState<any[]>([]);
+    const [error, setError] = useState<string | null>(null);
+    
+    // Delivery charge logic
+    const [deliveryCharges, setDeliveryCharges] = useState<any[]>([]);
+    const [selectedChargeId, setSelectedChargeId] = useState<string>('');
+    const [deliveryChargeAmount, setDeliveryChargeAmount] = useState(0);
     
     // Form fields
     const [fullName, setFullName] = useState('');
@@ -29,7 +42,53 @@ export default function Checkout() {
     const [trxId, setTrxId] = useState('');
     const [senderNumber, setSenderNumber] = useState('');
 
+    // Coupon logic
+    const [couponCode, setCouponCode] = useState('');
+    const [discount, setDiscount] = useState(0);
+    const [couponStatus, setCouponStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
     const paymentNumber = "01712-972683";
+
+    useEffect(() => {
+        setCartItems(getCart());
+        
+        fetchActiveDeliveryCharges()
+            .then(charges => {
+                if (charges && charges.length > 0) {
+                    setDeliveryCharges(charges);
+                    setSelectedChargeId(charges[0]._id);
+                    setDeliveryChargeAmount(charges[0].charge);
+                } else {
+                    const fallback = [{ _id: 'fallback', name: 'Standard Delivery', charge: 50 }];
+                    setDeliveryCharges(fallback);
+                    setSelectedChargeId('fallback');
+                    setDeliveryChargeAmount(50);
+                }
+            })
+            .catch(err => {
+                console.error("Error fetching delivery charges:", err);
+                const fallback = [{ _id: 'fallback', name: 'Standard Delivery', charge: 50 }];
+                setDeliveryCharges(fallback);
+                setSelectedChargeId('fallback');
+                setDeliveryChargeAmount(50);
+            });
+    }, []);
+
+    useEffect(() => {
+        if (error) {
+            const timer = setTimeout(() => setError(null), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [error]);
+
+    const handleDeliveryChargeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const chargeId = e.target.value;
+        setSelectedChargeId(chargeId);
+        const foundCharge = deliveryCharges.find(c => c._id === chargeId);
+        if (foundCharge) {
+            setDeliveryChargeAmount(foundCharge.charge);
+        }
+    };
 
     const handleCopy = () => {
         navigator.clipboard.writeText(paymentNumber);
@@ -37,30 +96,69 @@ export default function Checkout() {
         setTimeout(() => setIsCopied(false), 2000);
     };
 
+    const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+    const applyCoupon = async () => {
+        if (!couponCode) return;
+        setError(null);
+        setLoading(true);
+        try {
+            const data = await applyCouponApi(couponCode, subtotal);
+            setDiscount(data.discount);
+            setCouponStatus({ type: 'success', message: `${data.discount}৳ ডিসকাউন্ট সফলভাবে যুক্ত হয়েছে!` });
+        } catch (err: any) {
+            setDiscount(0);
+            setCouponStatus({ type: 'error', message: err.message || 'সঠিক কুপন কোড দিন।' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const paymentOptions = [
         { id: 'cod', name: 'Cash on Delivery', color: '#1B5E20' },
         { id: 'bkash', name: 'bKash', color: '#D12053' },
         { id: 'nagad', name: 'Nagad', color: '#F44336' },
-        { id: 'rocket', name: 'Rocket', color: '#8E24AA' },
     ];
 
+    const total = subtotal + deliveryChargeAmount - discount;
+
     const handlePlaceOrder = async () => {
+        setError(null);
         if (!fullName || !phone || !address) {
-            alert('দয়া করে সব তথ্য পূরণ করুন।');
+            setError('দয়া করে সব তথ্য পূরণ করুন।');
             return;
+        }
+
+        if (cartItems.length === 0) {
+            setError('আপনার কার্ট খালি।');
+            return;
+        }
+
+        if (paymentMethod !== 'cod') {
+            if (!senderNumber) {
+                setError('দয়া করে পেমেন্টকৃত নম্বরটি দিন।');
+                return;
+            }
+            if (!trxId && !screenshot) {
+                setError('দয়া করে ট্রানজেকশন আইডি অথবা পেমেন্ট স্ক্রিনশট দিন।');
+                return;
+            }
         }
 
         setLoading(true);
         try {
-            // For demo, we'll fetch products and use the first one as order item
-            // In real app, this would come from the Cart state/context
-            const products = await fetchProducts();
-            const orderItems = products.slice(0, 1).map(p => ({
+            let screenshotUrl = '';
+            if (screenshot) {
+                const uploadRes = await uploadImage(screenshot);
+                screenshotUrl = uploadRes.url;
+            }
+
+            const orderItems = cartItems.map(p => ({
                 product: p.id,
-                name: p.name,
+                name: p.nameBn,
                 image: p.image,
                 price: p.price,
-                quantity: 1
+                quantity: p.quantity
             }));
 
             const orderData = {
@@ -69,21 +167,30 @@ export default function Checkout() {
                     fullName,
                     phone,
                     address,
-                    city: 'Rajshahi' // Default or from form
+                    city: 'Rajshahi'
                 },
-                paymentMethod: paymentMethod.toUpperCase(),
-                itemsPrice: orderItems.reduce((acc, item) => acc + item.price * item.quantity, 0),
-                shippingPrice: 50,
-                totalPrice: orderItems.reduce((acc, item) => acc + item.price * item.quantity, 0) + 50,
+                paymentMethod: paymentMethod === 'cod' ? 'COD' : 
+                               paymentMethod === 'bkash' ? 'Bkash' : 
+                               paymentMethod === 'nagad' ? 'Nagad' : 'Card',
+                itemsPrice: subtotal,
+                shippingPrice: deliveryChargeAmount,
+                totalPrice: total,
+                discountPrice: discount,
+                couponCode: couponCode,
                 orderStatus: 'pending',
-                isPaid: paymentMethod !== 'cod'
+                isPaid: paymentMethod !== 'cod',
+                senderNumber: senderNumber,
+                trxId: trxId,
+                paymentScreenshot: screenshotUrl
             };
 
             await createOrder(orderData);
+            localStorage.removeItem('mango_shop_cart');
+            window.dispatchEvent(new Event('cart-updated'));
             setIsOrdered(true);
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            alert('অর্ডার প্লেস করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+            setError(err.message || 'অর্ডার প্লেস করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
         } finally {
             setLoading(false);
         }
@@ -105,11 +212,18 @@ export default function Checkout() {
     return (
         <div className="checkout-page">
             <div className="checkout-back">
-                <Link href="/">
+                <Link href="/cart">
                     <ArrowLeft size={24} />
                 </Link>
                 <span>চেকআউট</span>
             </div>
+
+            {error && (
+                <div className="visual-error">
+                    <AlertCircle size={20} />
+                    <span>{error}</span>
+                </div>
+            )}
 
             {/* Delivery Address */}
             <div className="checkout-section">
@@ -196,7 +310,6 @@ export default function Checkout() {
                     ))}
                 </div>
 
-                {/* Conditional Mobile Banking Details */}
                 {paymentMethod !== 'cod' && (
                     <div className="mobile-banking-form">
                         <p style={{ fontSize: '13px', color: '#666', marginBottom: '16px', background: '#f8f8f8', padding: '10px', borderRadius: '8px', borderLeft: `4px solid ${paymentOptions.find(o => o.id === paymentMethod)?.color}` }}>
@@ -223,7 +336,6 @@ export default function Checkout() {
                                 {isCopied ? 'কপি হয়েছে!' : 'কপি করুন'}
                             </button>
                         </p>
-
 
                         <div className="form-group">
                             <label className="form-label">যে নম্বর থেকে টাকা পাঠিয়েছেন</label>
@@ -283,27 +395,84 @@ export default function Checkout() {
                 )}
             </div>
 
+            {/* Delivery Charge Dropdown */}
+            <div className="checkout-section">
+                <h3 className="section-title">
+                    <Truck size={18} />
+                    ডেলিভারি চার্জ নির্বাচন করুন
+                </h3>
+                <div className="form-group">
+                    <select 
+                        className="form-input" 
+                        value={selectedChargeId}
+                        onChange={handleDeliveryChargeChange}
+                        style={{ appearance: 'auto', paddingRight: '30px' }}
+                    >
+                        {deliveryCharges.map((charge) => (
+                            <option key={charge._id} value={charge._id}>
+                                {charge.name} - ৳{charge.charge}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
+            {/* Coupon Section */}
+            <div className="checkout-section">
+                <h3 className="section-title">
+                    <Ticket size={18} />
+                    প্রোমো কোড
+                </h3>
+                <div className="coupon-wrapper">
+                    <input 
+                        type="text" 
+                        placeholder="কুপন কোড দিন" 
+                        className="coupon-input"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                    />
+                    <button 
+                        className="coupon-apply-btn" 
+                        onClick={applyCoupon}
+                        disabled={loading || !couponCode}
+                    >
+                        {loading ? 'প্রয়োগ হচ্ছে...' : 'প্রয়োগ করুন'}
+                    </button>
+                </div>
+                {couponStatus && (
+                    <span className={`coupon-status ${couponStatus.type}`}>
+                        {couponStatus.message}
+                    </span>
+                )}
+            </div>
+
             {/* Order Summary */}
             <div className="checkout-section">
                 <h3 className="section-title">অর্ডার সামারি</h3>
                 <div className="order-summary-mini">
                     <span>সাবটোটাল</span>
-                    <span>৳৭৯০</span>
+                    <span>৳{subtotal}</span>
                 </div>
                 <div className="order-summary-mini">
                     <span>ডেলিভারি চার্জ</span>
-                    <span>৳৫০</span>
+                    <span>৳{deliveryChargeAmount}</span>
                 </div>
+                {discount > 0 && (
+                    <div className="order-summary-mini discount-row">
+                        <span>ডিসকাউন্ট</span>
+                        <span>-৳{discount}</span>
+                    </div>
+                )}
                 <div className="order-total-mini">
                     <span>সর্বমোট</span>
-                    <span style={{ color: 'var(--primary-green)' }}>৳৮৪০</span>
+                    <span style={{ color: 'var(--primary-green)' }}>৳{total}</span>
                 </div>
             </div>
 
             <button 
-                className={`place-order-btn ${loading ? 'opacity-50 cursor-not-allowed' : ''}`} 
+                className={`place-order-btn ${loading || cartItems.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`} 
                 onClick={handlePlaceOrder}
-                disabled={loading}
+                disabled={loading || cartItems.length === 0}
             >
                 {loading ? 'অর্ডার হচ্ছে...' : 'অর্ডার কনফার্ম করুন'}
             </button>

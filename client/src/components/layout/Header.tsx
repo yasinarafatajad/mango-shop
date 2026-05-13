@@ -8,11 +8,67 @@ import {
   Search,
   User,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { fetchProducts } from "@/lib/api";
+import { Mango } from "@/lib/type";
+import { getCart } from "@/lib/storage";
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const isHomePage = pathname === "/";
+  
+  const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<Mango[]>([]);
+  const [allProducts, setAllProducts] = useState<Mango[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetchProducts().then(setAllProducts).catch(console.error);
+    
+    const updateCount = () => {
+      const cart = getCart();
+      setCartCount(cart.reduce((sum, item) => sum + item.quantity, 0));
+    };
+
+    updateCount();
+    window.addEventListener('cart-updated', updateCount);
+    return () => window.removeEventListener('cart-updated', updateCount);
+  }, []);
+
+  useEffect(() => {
+    if (searchQuery.trim().length > 0) {
+      const filtered = allProducts.filter(p => 
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        p.nameBn.includes(searchQuery)
+      ).slice(0, 5);
+      setSuggestions(filtered);
+      setShowSuggestions(true);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [searchQuery, allProducts]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSuggestionClick = (id: string) => {
+    router.push(`/product/${id}`);
+    setSearchQuery("");
+    setShowSuggestions(false);
+  };
+
   return (
     <header className="header" style={{ padding: isHomePage ? '12px 20px 20px' : '5px 20px 5px' }}>
       <div className="header-container">
@@ -29,7 +85,7 @@ export default function Header() {
             {/* Cart */}
             <Link href="/cart" className="cart-btn">
               <ShoppingCart className="cart-icon" />
-              <span className="cart-badge">3</span>
+              {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
             </Link>
 
             {/* Login */}
@@ -41,13 +97,38 @@ export default function Header() {
 
         {/* Search */}
         {isHomePage && (
-          <div className="search-wrapper">
-            <Search className="search-icon" />
-            <input
-              type="text"
-              placeholder="পণ্য সার্চ করুন.."
-              className="search-input"
-            />
+          <div className="search-wrapper" ref={searchRef}>
+            <div className="relative w-full">
+              <Search className="search-icon" />
+              <input
+                type="text"
+                placeholder="পণ্য সার্চ করুন.."
+                className="search-input"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => searchQuery && setShowSuggestions(true)}
+              />
+            </div>
+            
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="suggestions-dropdown">
+                {suggestions.map((product) => (
+                  <div 
+                    key={product.id} 
+                    className="suggestion-item"
+                    onClick={() => handleSuggestionClick(product.id)}
+                  >
+                    <img src={product.image} alt={product.nameBn} className="suggestion-image" />
+                    <div className="suggestion-info">
+                      <div className="suggestion-name">{product.nameBn}</div>
+                      <div className="suggestion-details">
+                        ৳{product.price} / {product.unit}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

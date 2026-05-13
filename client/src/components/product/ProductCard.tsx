@@ -1,18 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Heart } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { addToCart, toggleWishlist, isInWishlist } from '@/lib/storage';
+import { Mango } from '@/lib/type';
 
 interface ProductCardProps {
-  mango: {
-    id: string;
-    nameBn: string;
-    price: number;
-    unit: string;
-    image: string;
-  };
+  mango: any; // Using any to handle both full Mango and simplified props
 }
 
 export default function ProductCard({ mango }: ProductCardProps) {
@@ -20,13 +16,27 @@ export default function ProductCard({ mango }: ProductCardProps) {
   const pathname = usePathname();
   const isWishlistPage = pathname === "/wishlist";
 
-  const handleAddToCart = (id: string) => {
-    console.log(id);
-  };
-  const handleAddToWishlist = (id: string, e: React.MouseEvent) => {
+  useEffect(() => {
+    setIsLiked(isInWishlist(mango.id));
+    
+    const handleWishlistUpdate = () => {
+      setIsLiked(isInWishlist(mango.id));
+    };
+    
+    window.addEventListener('wishlist-updated', handleWishlistUpdate);
+    return () => window.removeEventListener('wishlist-updated', handleWishlistUpdate);
+  }, [mango.id]);
+
+  const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsLiked(!isLiked);
-    console.log("wish: ", id);
+    e.stopPropagation();
+    addToCart(mango as Mango);
+  };
+
+  const handleAddToWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWishlist(mango as Mango);
   };
 
   return (
@@ -41,7 +51,7 @@ export default function ProductCard({ mango }: ProductCardProps) {
         </Link>
         {!isWishlistPage && (
           <button
-            onClick={(e) => handleAddToWishlist(mango.id, e)}
+            onClick={handleAddToWishlist}
             className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-sm z-10 hover:scale-110 active:scale-95 transition-transform"
           >
             <Heart
@@ -61,7 +71,7 @@ export default function ProductCard({ mango }: ProductCardProps) {
           <div className="product-price">
             ৳{mango.price} <span className="product-unit">/ {mango.unit}</span>
           </div>
-          <button onClick={() => handleAddToCart(mango.id)} className="add-btn hover:scale-110 active:scale-95 transition-transform">
+          <button onClick={handleAddToCart} className="add-btn hover:scale-110 active:scale-95 transition-transform">
             <Plus size={18} />
           </button>
         </div>

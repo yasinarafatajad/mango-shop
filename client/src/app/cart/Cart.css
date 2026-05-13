@@ -92,10 +92,8 @@
 
 .cart-summary {
   background: var(--white);
-  padding: 20px;
+  padding: 0 20px;
   border-radius: var(--radius-md);
-  border: 1px solid #f0f0f0;
-  margin-bottom: 24px;
 }
 
 .summary-row {
@@ -107,7 +105,6 @@
 }
 
 .summary-row.total {
-  margin-top: 12px;
   padding-top: 12px;
   border-top: 1px dashed #eee;
   font-size: 18px;

@@ -1,36 +1,30 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Heart, ShoppingCart, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { fetchProducts } from '@/lib/api';
 import { Mango } from '@/lib/type';
 import ProductCard from '@/components/product/ProductCard';
+import { getWishlist, toggleWishlist } from '@/lib/storage';
 import './Wishlist.css';
 
 export default function Wishlist() {
   const [wishlistItems, setWishlistItems] = useState<Mango[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const refreshWishlist = () => {
+    setWishlistItems(getWishlist());
+    setLoading(false);
+  };
+
   useEffect(() => {
-    // For demonstration, fetch products and use a few as wishlist items
-    fetchProducts()
-      .then(products => {
-        if (products.length > 3) {
-          setWishlistItems([products[0], products[2], products[5]]);
-        } else {
-          setWishlistItems(products);
-        }
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+    refreshWishlist();
+    window.addEventListener('wishlist-updated', refreshWishlist);
+    return () => window.removeEventListener('wishlist-updated', refreshWishlist);
   }, []);
 
-  const removeFromWishlist = (id: string) => {
-    setWishlistItems(prev => prev.filter(item => item.id !== id));
+  const removeFromWishlist = (mango: Mango) => {
+    toggleWishlist(mango);
   };
 
   if (loading) return <div className="py-20 text-center text-primary-green font-semibold">পছন্দের তালিকা লোড হচ্ছে...</div>;
@@ -56,7 +50,7 @@ export default function Wishlist() {
             <div key={mango.id} style={{ position: 'relative' }}>
               <ProductCard mango={mango} />
               <button 
-                onClick={() => removeFromWishlist(mango.id)}
+                onClick={() => removeFromWishlist(mango)}
                 style={{
                   position: 'absolute',
                   top: '8px',
