@@ -17,9 +17,10 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import "./profile.css";
+import { UserType } from "@/lib/type";
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

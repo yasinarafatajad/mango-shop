@@ -1,4 +1,4 @@
-import { Mango, Order, User } from "./type";
+import { Mango, Order, UserType } from "./type";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL+"/api/v1" || 'http://localhost:3001/api/v1';
 
@@ -77,7 +77,7 @@ export const fetchOrderById = async (id: string): Promise<any> => {
   };
 };
 
-export const fetchCustomerById = async (id: string): Promise<User> => {
+export const fetchCustomerById = async (id: string): Promise<UserType> => {
   const response = await fetch(`${API_URL}/getCustomer/${id}`);
   if (!response.ok) {
     throw new Error('Failed to fetch customer');
@@ -95,7 +95,7 @@ export const fetchCustomerById = async (id: string): Promise<User> => {
   };
 };
 
-export const fetchAllCustomers = async (): Promise<User[]> => {
+export const fetchAllCustomers = async (): Promise<UserType[]> => {
   const response = await fetch(`${API_URL}/getAllCustomer`);
   if (!response.ok) {
     return [];
