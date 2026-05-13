@@ -34,11 +34,12 @@ export const fetchProductById = async (id: string): Promise<Mango> => {
 };
 
 export const fetchOrders = async (): Promise<Order[]> => {
-  const response = await fetch(`${API_URL}/orders`);
+  const response = await fetch(`${API_URL}/getAllOrder`);
   if (!response.ok) {
     return [];
   }
   const data = await response.json();
+  // Server returns a list of orders directly for getAllOrder
   return data.map((order: any) => ({
     id: order._id,
     date: new Date(order.createdAt).toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' }),
@@ -54,13 +55,14 @@ export const fetchOrders = async (): Promise<Order[]> => {
   }));
 };
 
-export const fetchOrderById = async (id: string): Promise<Order> => {
-  const response = await fetch(`${API_URL}/orders/${id}`);
+export const fetchOrderById = async (id: string): Promise<any> => {
+  const response = await fetch(`${API_URL}/getOrder/${id}`);
   if (!response.ok) {
     throw new Error('Failed to fetch order');
   }
   const order = await response.json();
   return {
+    ...order,
     id: order._id,
     date: new Date(order.createdAt).toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' }),
     total: order.totalPrice,
@@ -112,7 +114,7 @@ export const fetchAllCustomers = async (): Promise<User[]> => {
 };
 
 export const createOrder = async (orderData: any): Promise<any> => {
-  const response = await fetch(`${API_URL}/orders`, {
+  const response = await fetch(`${API_URL}/addOrder`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -123,4 +125,43 @@ export const createOrder = async (orderData: any): Promise<any> => {
     throw new Error('Failed to create order');
   }
   return await response.json();
+};
+
+export const applyCoupon = async (code: string, orderAmount: number): Promise<any> => {
+  const response = await fetch(`${API_URL}/coupon/apply`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ code, orderAmount }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Failed to apply coupon');
+  }
+  return data;
+};
+
+export const fetchActiveDeliveryCharges = async (): Promise<any[]> => {
+  const response = await fetch(`${API_URL}/deliveryCharges/active`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch delivery charges');
+  }
+  return await response.json();
+};
+
+export const uploadImage = async (file: File, folder: string = 'orders'): Promise<any> => {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const response = await fetch(`${API_URL}/upload?folder=${folder}`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Image upload failed');
+  }
+  return data;
 };

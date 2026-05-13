@@ -3,8 +3,10 @@
 import { useState, use, useEffect } from 'react';
 import { ArrowLeft, Minus, Plus, ShoppingCart, Zap, Heart } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { fetchProductById } from '@/lib/api';
 import { Mango } from '@/lib/type';
+import { addToCart, toggleWishlist, isInWishlist } from '@/lib/storage';
 import './ProductDetails.css';
 
 export default function ProductDetails({ params }: { params: Promise<{ id: string }> }) {
@@ -13,17 +15,26 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     fetchProductById(id)
       .then(data => {
         setMango(data);
         setLoading(false);
+        setIsFavorite(isInWishlist(id));
       })
       .catch(err => {
         console.error(err);
         setLoading(false);
       });
+
+    const handleWishlistUpdate = () => {
+      setIsFavorite(isInWishlist(id));
+    };
+    
+    window.addEventListener('wishlist-updated', handleWishlistUpdate);
+    return () => window.removeEventListener('wishlist-updated', handleWishlistUpdate);
   }, [id]);
 
   if (loading) {
@@ -47,14 +58,26 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
     setQuantity(prev => Math.max(1, prev + delta));
   };
 
-  const handleAddToCart = (id: string) => {
-    console.log("Added to cart:", id, "Quantity:", quantity);
+  const handleAddToCart = () => {
+    if (mango) {
+      addToCart(mango, quantity);
+    }
+  };
+
+  const handleBuyNow = () => {
+    if (mango) {
+      // Clear existing cart for "Buy Now" functionality
+      localStorage.removeItem('mango_shop_cart');
+      addToCart(mango, quantity);
+      router.push('/checkout');
+    }
   };
   
-  const handleAddToWishlist = (id: string, e: React.MouseEvent) => {
+  const handleAddToWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsFavorite(!isFavorite);
-    console.log("Toggled wishlist for:", id);
+    if (mango) {
+      toggleWishlist(mango);
+    }
   };
 
   return (
@@ -65,7 +88,7 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
         </Link>
         <button
           className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-md z-10"
-          onClick={(e) => handleAddToWishlist(mango.id, e)}
+          onClick={handleAddToWishlist}
         >
           <Heart size={24} fill={isFavorite ? "#ff4d4d" : "none"} color={isFavorite ? "#ff4d4d" : "#1A1A1A"} />
         </button>
@@ -99,14 +122,14 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
         </div>
 
         <div className="action-buttons">
-          <button onClick={() => handleAddToCart(mango.id)} className="add-cart-btn-large">
+          <button onClick={handleAddToCart} className="add-cart-btn-large">
             <span><ShoppingCart size={20} /></span>
             <span>কার্টে যোগ করুন</span>
           </button>
-          <Link href="/checkout" className="buy-now-btn-large">
+          <button onClick={handleBuyNow} className="buy-now-btn-large">
             <span><Zap size={20} /></span>
             <span>এখনই কিনুন</span>
-          </Link>
+          </button>
         </div>
       </div>
     </div>
