@@ -18,7 +18,7 @@ export interface Order {
   items: Mango[];
 }
 
-export interface User {
+export interface UserType {
   id: string;
   name: string;
   email: string;
@@ -27,4 +27,4 @@ export interface User {
   image: string;
   address?: string;
   joinDate: string;
-}
+}
