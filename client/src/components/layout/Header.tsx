@@ -80,8 +80,45 @@ export default function Header() {
             <h1 className="logo-text">MangoShop</h1>
           </Link>
 
+          {/* Search */}
+          {isHomePage && (
+            <div className="search-wrapper" ref={searchRef}>
+              <div className="relative w-full">
+                <Search className="search-icon" />
+                <input
+                  type="text"
+                  placeholder="পণ্য সার্চ করুন.."
+                  className="search-input"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => searchQuery && setShowSuggestions(true)}
+                />
+              </div>
+              
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="suggestions-dropdown">
+                  {suggestions.map((product) => (
+                    <div 
+                      key={product.id} 
+                      className="suggestion-item"
+                      onClick={() => handleSuggestionClick(product.id)}
+                    >
+                      <img src={product.image} alt={product.nameBn} className="suggestion-image" />
+                      <div className="suggestion-info">
+                        <div className="suggestion-name">{product.nameBn}</div>
+                        <div className="suggestion-details">
+                          ৳{product.price} / {product.unit}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Icons Group */}
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div className="icons-group" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             {/* Cart */}
             <Link href="/cart" className="cart-btn">
               <ShoppingCart className="cart-icon" />
@@ -95,42 +132,14 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Search */}
-        {isHomePage && (
-          <div className="search-wrapper" ref={searchRef}>
-            <div className="relative w-full">
-              <Search className="search-icon" />
-              <input
-                type="text"
-                placeholder="পণ্য সার্চ করুন.."
-                className="search-input"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => searchQuery && setShowSuggestions(true)}
-              />
-            </div>
-            
-            {showSuggestions && suggestions.length > 0 && (
-              <div className="suggestions-dropdown">
-                {suggestions.map((product) => (
-                  <div 
-                    key={product.id} 
-                    className="suggestion-item"
-                    onClick={() => handleSuggestionClick(product.id)}
-                  >
-                    <img src={product.image} alt={product.nameBn} className="suggestion-image" />
-                    <div className="suggestion-info">
-                      <div className="suggestion-name">{product.nameBn}</div>
-                      <div className="suggestion-details">
-                        ৳{product.price} / {product.unit}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+        {/* Desktop Navbar */}
+        <nav className="desktop-navbar">
+          <Link href="/" className="desktop-nav-link">হোম</Link>
+          <Link href="/all-products" className="desktop-nav-link">সব আম</Link>
+          <Link href="/my-orders" className="desktop-nav-link">আমার অর্ডার</Link>
+          <Link href="/wishlist" className="desktop-nav-link">পছন্দের তালিকা</Link>
+          <Link href="/profile" className="desktop-nav-link">প্রোফাইল</Link>
+        </nav>
       </div>
     </header>
   );
