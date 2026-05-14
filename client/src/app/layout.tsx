@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import BottomNav from "@/components/layout/BottomNav";
+import Footer from "@/components/layout/Footer";
 import { ReactNode } from "react";
 
 const geistSans = Geist({
@@ -27,11 +28,12 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html>
-      <body className="bg-offwhite">
+      <body className="app-container pb-24">
         <Header />
-        <main className="app-container pb-24">
+        <div style={{ minHeight: "calc(100vh - 300px)" }}>
           {children}
-        </main>
+        </div>
+        <Footer />
         <BottomNav />
       </body>
     </html>
