@@ -46,7 +46,7 @@ export default function AllProducts() {
         </Link>
         <h1 className="page-title">লোড হচ্ছে...</h1>
       </header>
-      <div className="py-20 text-center text-primary-green font-semibold">সব আম লোড করা হচ্ছে...</div>
+      <div className="loading-state">সব আম লোড করা হচ্ছে...</div>
     </div>
   );
 
@@ -61,7 +61,7 @@ export default function AllProducts() {
 
       <div className="products-container">
         {products.length === 0 ? (
-          <div className="py-20 text-center text-gray-500">কোনো আম পাওয়া যায়নি।</div>
+          <div className="empty-state">কোনো আম পাওয়া যায়নি।</div>
         ) : (
           <>
             <div className="products-grid">

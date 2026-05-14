@@ -38,11 +38,11 @@ export default function ProfilePage() {
       });
   }, []);
 
-  if (loading) return <div className="py-20 text-center text-primary-green font-semibold">প্রোফাইল লোড হচ্ছে...</div>;
+  if (loading) return <div className="loading-state">প্রোফাইল লোড হচ্ছে...</div>;
 
   if (!user) {
     return (
-      <div className="py-20 text-center">
+      <div className="empty-state">
         <p>প্রোফাইল পাওয়া যায়নি।</p>
         <Link href="/" className="text-primary-green underline">হোমে ফিরে যান</Link>
       </div>

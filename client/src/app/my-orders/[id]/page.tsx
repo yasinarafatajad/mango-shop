@@ -45,7 +45,7 @@ export default function OrderDetails({ params }: { params: Promise<{ id: string 
           </Link>
           <h1 className="orders-title">লোড হচ্ছে...</h1>
         </div>
-        <div className="py-20 text-center text-primary-green font-semibold">অর্ডার বিস্তারিত লোড হচ্ছে...</div>
+        <div className="loading-state">অর্ডার বিস্তারিত লোড হচ্ছে...</div>
       </div>
     );
   }

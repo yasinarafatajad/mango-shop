@@ -1,6 +1,5 @@
 @import url('https://fonts.maateen.me/charu-chandan/font.css');
 @import url('https://fonts.maateen.me/bensen-handwriting/font.css');
-@import "tailwindcss";
 
 :root {
   --primary-orange: #FB8C00;
@@ -179,7 +178,44 @@ a {
   width: 100%;
   aspect-ratio: 1;
   object-fit: cover;
+  transition: transform 0.5s;
 }
+
+.product-card:hover .product-image {
+  transform: scale(1.1);
+}
+
+.wishlist-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  z-index: 10;
+  transition: transform 0.3s;
+}
+
+.wishlist-btn:hover {
+  transform: scale(1.1);
+}
+
+.wishlist-btn:active {
+  transform: scale(0.95);
+}
+
+.product-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
 
 .product-info {
   padding: 12px;
@@ -214,6 +250,15 @@ a {
   justify-content: center;
   font-size: 20px;
   margin-left: auto;
+  transition: transform 0.3s;
+}
+
+.add-btn:hover {
+  transform: scale(1.1);
+}
+
+.add-btn:active {
+  transform: scale(0.95);
 }
 
 /* Bottom Nav */
@@ -283,26 +328,109 @@ a {
   align-items: center;
 }
 
+.justify-center {
+  justify-content: center;
+}
+
 .justify-between {
   justify-content: space-between;
 }
 
-.gap-3 {
-  gap: 12px;
+.flex-1 {
+  flex: 1;
 }
 
-.mt-1 {
-  margin-top: 4px;
+.gap-1 { gap: 4px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+
+/* Spacing Utilities */
+.p-2 { padding: 8px; }
+.p-4 { padding: 16px; }
+.p-6 { padding: 24px; }
+.px-4 { padding-left: 16px; padding-right: 16px; }
+.py-2 { padding-top: 8px; padding-bottom: 8px; }
+.py-4 { padding-top: 16px; padding-bottom: 16px; }
+.py-10 { padding-top: 40px; padding-bottom: 40px; }
+.py-20 { padding-top: 80px; padding-bottom: 80px; }
+
+.m-1 { margin: 4px; }
+.m-2 { margin: 8px; }
+.mt-1 { margin-top: 4px; }
+.mt-2 { margin-top: 8px; }
+.mb-1 { margin-bottom: 4px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-4 { margin-bottom: 16px; }
+.ml-auto { margin-left: auto; }
+
+/* Text Utilities */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.text-xs { font-size: 12px; }
+.text-sm { font-size: 14px; }
+.text-base { font-size: 16px; }
+.text-lg { font-size: 18px; }
+.text-xl { font-size: 20px; }
+
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+.text-primary-orange { color: var(--primary-orange); }
+.text-primary-green { color: var(--primary-green); }
+.text-white { color: var(--white); }
+.text-dark { color: var(--text-dark); }
+.text-gray-400 { color: #9ca3af; }
+.text-gray-500 { color: #6b7280; }
+.text-gray-600 { color: #4b5563; }
+
+.underline { text-decoration: underline; }
+
+/* Layout & Sizing */
+.relative { position: relative; }
+.absolute { position: absolute; }
+.top-2 { top: 8px; }
+.right-2 { right: 8px; }
+.z-10 { z-index: 10; }
+
+.w-full { width: 100%; }
+.w-8 { width: 32px; }
+.h-8 { height: 32px; }
+.aspect-square { aspect-ratio: 1 / 1; }
+
+.overflow-hidden { overflow: hidden; }
+.rounded-full { border-radius: 9999px; }
+
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+
+/* Transitions */
+.transition-all { transition: all 0.3s; }
+.transition-transform { transition: transform 0.3s; }
+.duration-500 { transition-duration: 500ms; }
+
+/* Interaction */
+.hover\:scale-110:hover { transform: scale(1.1); }
+.active\:scale-95:active { transform: scale(0.95); }
+.cursor-pointer { cursor: pointer; }
+
+/* Object Fit */
+.object-cover { object-fit: cover; }
+
+/* Custom Component Helpers */
+.loading-state {
+  padding: 40px 0;
+  text-align: center;
+  color: var(--primary-green);
+  font-weight: 600;
 }
 
-.mb-2 {
-  margin-bottom: 8px;
-}
-
-.p-4 {
-  padding: 16px;
-}
-
-.mb-4 {
-  margin-bottom: 16px;
+.empty-state {
+  padding: 40px 0;
+  text-align: center;
+  color: var(--text-dark);
+  opacity: 0.6;
 }

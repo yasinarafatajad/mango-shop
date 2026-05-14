@@ -47,7 +47,7 @@ export default function MyOrders() {
         <div className="orders-header">
           <h1 className="orders-title">আমার অর্ডারসমূহ</h1>
         </div>
-        <div className="py-20 text-center text-primary-green font-semibold">অর্ডারগুলো লোড হচ্ছে...</div>
+        <div className="loading-state">অর্ডারগুলো লোড হচ্ছে...</div>
       </div>
     );
   }

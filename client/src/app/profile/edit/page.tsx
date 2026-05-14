@@ -42,9 +42,9 @@ export default function EditProfilePage() {
     router.back();
   };
 
-  if (loading) return <div className="py-20 text-center text-primary-green font-semibold">লোড হচ্ছে...</div>;
+  if (loading) return <div className="loading-state">লোড হচ্ছে...</div>;
 
-  if (!user) return <div className="py-20 text-center">ব্যবহারকারী পাওয়া যায়নি।</div>;
+  if (!user) return <div className="empty-state">ব্যবহারকারী পাওয়া যায়নি।</div>;
 
   return (
     <div className="profile-container animate-in">

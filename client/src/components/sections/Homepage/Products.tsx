@@ -23,8 +23,8 @@ export default function Products() {
             });
     }, []);
 
-    if (loading) return <div className="py-10 text-center text-primary-green font-semibold">লোড হচ্ছে...</div>;
-    if (products.length === 0) return <div className="py-10 text-center text-gray-500">কোনো আম পাওয়া যায়নি।</div>;
+    if (loading) return <div className="loading-state">লোড হচ্ছে...</div>;
+    if (products.length === 0) return <div className="empty-state">কোনো আম পাওয়া যায়নি।</div>;
 
     return (
         <section>
