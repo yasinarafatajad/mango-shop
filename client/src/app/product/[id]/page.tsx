@@ -87,7 +87,7 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
           <ArrowLeft size={24} />
         </Link>
         <button
-          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-md z-10"
+          className="wish-btn "
           onClick={handleAddToWishlist}
         >
           <Heart size={24} fill={isFavorite ? "#ff4d4d" : "none"} color={isFavorite ? "#ff4d4d" : "#1A1A1A"} />
