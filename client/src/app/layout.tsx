@@ -27,9 +27,11 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html>
-      <body className="app-container pb-24">
+      <body className="bg-offwhite">
         <Header />
-        {children}
+        <main className="app-container pb-24">
+          {children}
+        </main>
         <BottomNav />
       </body>
     </html>

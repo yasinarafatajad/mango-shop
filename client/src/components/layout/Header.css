@@ -19,15 +19,16 @@
 
 .header-container {
   width: 100%;
-  max-width: 1280px;
+  max-width: 1728px;
   margin: 0 auto;
 }
 
 .header-top {
-  height: 64px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  padding-top: 8px;
 }
 
 .logo-wrapper {
@@ -107,8 +108,8 @@
 .search-wrapper {
   position: relative;
   width: 100%;
-  max-width: 700px;
-  margin: 0 auto;
+  order: 3;
+  margin-top: 14px;
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
@@ -161,7 +162,7 @@
   background: white;
   border-radius: 10px;
   margin-top: 8px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border);
   overflow: hidden;
   z-index: 1001;
@@ -206,4 +207,46 @@
   font-size: 12px;
   color: var(--text-light);
   margin-top: 2px;
+}
+
+/* Desktop Navbar */
+.desktop-navbar {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .desktop-navbar {
+    display: flex;
+    gap: 24px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    justify-content: center;
+  }
+
+  .desktop-nav-link {
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    font-family: var(--font-primary);
+  }
+
+  .desktop-nav-link:hover {
+    opacity: 0.8;
+  }
+
+  .search-wrapper {
+    order: 2;
+    margin-top: 0;
+    margin-left: 24px;
+    margin-right: 24px;
+    flex: 1;
+    max-width: 600px;
+  }
+
+  .icons-group {
+    order: 3;
+  }
 }

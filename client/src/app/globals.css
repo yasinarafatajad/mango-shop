@@ -21,8 +21,15 @@
 }
 
 @keyframes animate-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 
@@ -53,7 +60,7 @@ a {
 }
 
 .app-container {
-  max-width: 480px;
+  max-width: 100%;
   margin: 0 auto;
   min-height: 100vh;
   background: var(--white);
@@ -64,9 +71,25 @@ a {
 }
 
 @media (min-width: 481px) {
+  .app-container {
+    max-width: 480px;
+  }
+}
+
+@media (min-width: 768px) {
+  .app-container {
+    max-width: 1728px;
+    padding-bottom: 0;
+    min-height: calc(100vh - 120px);
+  }
+
   body {
     background: #f0f0f0;
   }
+}
+
+.bg-offwhite {
+  background-color: var(--bg-offwhite);
 }
 
 /* Header & Navigation */
@@ -162,6 +185,12 @@ a {
   padding: 16px;
 }
 
+@media (min-width: 768px) {
+  .products-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .product-card {
   background: var(--white);
   border-radius: var(--radius-md);
@@ -196,7 +225,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   z-index: 10;
   transition: transform 0.3s;
 }
@@ -277,6 +306,12 @@ a {
   z-index: 100;
 }
 
+@media (min-width: 768px) {
+  .bottom-nav {
+    display: none;
+  }
+}
+
 .nav-item {
   display: flex;
   flex-direction: column;
@@ -295,9 +330,12 @@ a {
 }
 
 /* Promo Section */
+.promo-section{
+  padding-bottom: 40px;
+}
 .promo-box {
   background: #FFF7ED;
-  padding: 24px;
+  padding: 70px;
   border-radius: var(--radius-md);
   border: 2px dashed #FED7AA;
   text-align: center;
@@ -340,85 +378,252 @@ a {
   flex: 1;
 }
 
-.gap-1 { gap: 4px; }
-.gap-2 { gap: 8px; }
-.gap-3 { gap: 12px; }
-.gap-4 { gap: 16px; }
+.gap-1 {
+  gap: 4px;
+}
+
+.gap-2 {
+  gap: 8px;
+}
+
+.gap-3 {
+  gap: 12px;
+}
+
+.gap-4 {
+  gap: 16px;
+}
 
 /* Spacing Utilities */
-.p-2 { padding: 8px; }
-.p-4 { padding: 16px; }
-.p-6 { padding: 24px; }
-.px-4 { padding-left: 16px; padding-right: 16px; }
-.py-2 { padding-top: 8px; padding-bottom: 8px; }
-.py-4 { padding-top: 16px; padding-bottom: 16px; }
-.py-10 { padding-top: 40px; padding-bottom: 40px; }
-.py-20 { padding-top: 80px; padding-bottom: 80px; }
+.p-2 {
+  padding: 8px;
+}
 
-.m-1 { margin: 4px; }
-.m-2 { margin: 8px; }
-.mt-1 { margin-top: 4px; }
-.mt-2 { margin-top: 8px; }
-.mb-1 { margin-bottom: 4px; }
-.mb-2 { margin-bottom: 8px; }
-.mb-4 { margin-bottom: 16px; }
-.ml-auto { margin-left: auto; }
+.p-4 {
+  padding: 16px;
+}
+
+.p-6 {
+  padding: 24px;
+}
+
+.px-4 {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.py-2 {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.py-4 {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.py-10 {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.py-20 {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+.m-1 {
+  margin: 4px;
+}
+
+.m-2 {
+  margin: 8px;
+}
+
+.mt-1 {
+  margin-top: 4px;
+}
+
+.mt-2 {
+  margin-top: 8px;
+}
+
+.mb-1 {
+  margin-bottom: 4px;
+}
+
+.mb-2 {
+  margin-bottom: 8px;
+}
+
+.mb-4 {
+  margin-bottom: 16px;
+}
+
+.ml-auto {
+  margin-left: auto;
+}
 
 /* Text Utilities */
-.text-center { text-align: center; }
-.text-left { text-align: left; }
-.text-right { text-align: right; }
+.text-center {
+  text-align: center;
+}
 
-.text-xs { font-size: 12px; }
-.text-sm { font-size: 14px; }
-.text-base { font-size: 16px; }
-.text-lg { font-size: 18px; }
-.text-xl { font-size: 20px; }
+.text-left {
+  text-align: left;
+}
 
-.font-normal { font-weight: 400; }
-.font-medium { font-weight: 500; }
-.font-semibold { font-weight: 600; }
-.font-bold { font-weight: 700; }
+.text-right {
+  text-align: right;
+}
 
-.text-primary-orange { color: var(--primary-orange); }
-.text-primary-green { color: var(--primary-green); }
-.text-white { color: var(--white); }
-.text-dark { color: var(--text-dark); }
-.text-gray-400 { color: #9ca3af; }
-.text-gray-500 { color: #6b7280; }
-.text-gray-600 { color: #4b5563; }
+.text-xs {
+  font-size: 12px;
+}
 
-.underline { text-decoration: underline; }
+.text-sm {
+  font-size: 14px;
+}
+
+.text-base {
+  font-size: 16px;
+}
+
+.text-lg {
+  font-size: 18px;
+}
+
+.text-xl {
+  font-size: 20px;
+}
+
+.font-normal {
+  font-weight: 400;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-primary-orange {
+  color: var(--primary-orange);
+}
+
+.text-primary-green {
+  color: var(--primary-green);
+}
+
+.text-white {
+  color: var(--white);
+}
+
+.text-dark {
+  color: var(--text-dark);
+}
+
+.text-gray-400 {
+  color: #9ca3af;
+}
+
+.text-gray-500 {
+  color: #6b7280;
+}
+
+.text-gray-600 {
+  color: #4b5563;
+}
+
+.underline {
+  text-decoration: underline;
+}
 
 /* Layout & Sizing */
-.relative { position: relative; }
-.absolute { position: absolute; }
-.top-2 { top: 8px; }
-.right-2 { right: 8px; }
-.z-10 { z-index: 10; }
+.relative {
+  position: relative;
+}
 
-.w-full { width: 100%; }
-.w-8 { width: 32px; }
-.h-8 { height: 32px; }
-.aspect-square { aspect-ratio: 1 / 1; }
+.absolute {
+  position: absolute;
+}
 
-.overflow-hidden { overflow: hidden; }
-.rounded-full { border-radius: 9999px; }
+.top-2 {
+  top: 8px;
+}
 
-.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+.right-2 {
+  right: 8px;
+}
+
+.z-10 {
+  z-index: 10;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.w-8 {
+  width: 32px;
+}
+
+.h-8 {
+  height: 32px;
+}
+
+.aspect-square {
+  aspect-ratio: 1 / 1;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
 
 /* Transitions */
-.transition-all { transition: all 0.3s; }
-.transition-transform { transition: transform 0.3s; }
-.duration-500 { transition-duration: 500ms; }
+.transition-all {
+  transition: all 0.3s;
+}
+
+.transition-transform {
+  transition: transform 0.3s;
+}
+
+.duration-500 {
+  transition-duration: 500ms;
+}
 
 /* Interaction */
-.hover\:scale-110:hover { transform: scale(1.1); }
-.active\:scale-95:active { transform: scale(0.95); }
-.cursor-pointer { cursor: pointer; }
+.hover\:scale-110:hover {
+  transform: scale(1.1);
+}
+
+.active\:scale-95:active {
+  transform: scale(0.95);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
 
 /* Object Fit */
-.object-cover { object-fit: cover; }
+.object-cover {
+  object-fit: cover;
+}
 
 /* Custom Component Helpers */
 .loading-state {
