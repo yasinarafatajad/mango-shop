@@ -32,7 +32,7 @@ export default function Cart() {
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const total = subtotal;
 
-  if (loading) return <div className="py-20 text-center text-primary-green font-semibold">কার্ট লোড হচ্ছে...</div>;
+  if (loading) return <div className="loading-state">কার্ট লোড হচ্ছে...</div>;
 
   return (
     <div className="cart-page">

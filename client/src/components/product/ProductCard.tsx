@@ -46,13 +46,13 @@ export default function ProductCard({ mango }: ProductCardProps) {
           <img
             src={mango.image}
             alt={mango.nameBn}
-            className="product-image group-hover:scale-110 transition-transform duration-500"
+            className="product-image"
           />
         </Link>
         {!isWishlistPage && (
           <button
             onClick={handleAddToWishlist}
-            className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-sm z-10 hover:scale-110 active:scale-95 transition-transform"
+            className="wishlist-btn"
           >
             <Heart
               size={18}
@@ -67,11 +67,11 @@ export default function ProductCard({ mango }: ProductCardProps) {
         <Link href={`/product/${mango.id}`}>
           <div className="product-name">{mango.nameBn}</div>
         </Link>
-        <div className="flex items-center justify-between mt-1">
+        <div className="product-actions">
           <div className="product-price">
             ৳{mango.price} <span className="product-unit">/ {mango.unit}</span>
           </div>
-          <button onClick={handleAddToCart} className="add-btn hover:scale-110 active:scale-95 transition-transform">
+          <button onClick={handleAddToCart} className="add-btn">
             <Plus size={18} />
           </button>
         </div>

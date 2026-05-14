@@ -27,7 +27,7 @@ export default function Wishlist() {
     toggleWishlist(mango);
   };
 
-  if (loading) return <div className="py-20 text-center text-primary-green font-semibold">পছন্দের তালিকা লোড হচ্ছে...</div>;
+  if (loading) return <div className="loading-state">পছন্দের তালিকা লোড হচ্ছে...</div>;
 
   return (
     <div className="wishlist-page">
