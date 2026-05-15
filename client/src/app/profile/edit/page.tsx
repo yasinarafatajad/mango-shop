@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchAllCustomers } from "@/lib/api";
+import { updateCustomer } from "@/lib/api";
 import { UserType } from "@/lib/type";
 import { 
   ChevronLeft, 
@@ -29,11 +29,35 @@ export default function EditProfilePage() {
     setLoading(false);
   }, []);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, we would call an API to update the profile
-    console.log("Saving profile changes...");
-    router.back();
+    if (!user) return;
+    
+    setLoading(true);
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const fullName = formData.get('fullName') as string;
+    const email = formData.get('email') as string;
+    const phone = formData.get('phone') as string;
+    const address = formData.get('address') as string;
+
+    try {
+      const response = await updateCustomer(user.id || (user as any)._id, {
+        fullName,
+        email,
+        phone,
+        address
+      });
+      
+      if (response.success) {
+        localStorage.setItem('mango_user', JSON.stringify(response.customer));
+        router.push('/profile');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('প্রোফাইল আপডেট করতে সমস্যা হয়েছে।');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) return <div className="loading-state">লোড হচ্ছে...</div>;
@@ -77,6 +101,7 @@ export default function EditProfilePage() {
             <User className="input-icon" size={18} />
             <input 
               type="text" 
+              name="fullName"
               defaultValue={user.name || user.fullName}
               className="form-input"
             />
@@ -89,6 +114,7 @@ export default function EditProfilePage() {
             <Mail className="input-icon" size={18} />
             <input 
               type="email" 
+              name="email"
               defaultValue={user.email}
               className="form-input"
             />
@@ -101,6 +127,7 @@ export default function EditProfilePage() {
             <Phone className="input-icon" size={18} />
             <input 
               type="tel" 
+              name="phone"
               defaultValue={user.phone}
               className="form-input"
             />
@@ -112,6 +139,7 @@ export default function EditProfilePage() {
           <div className="input-wrapper">
             <MapPin className="input-icon top" size={18} />
             <textarea 
+              name="address"
               defaultValue={typeof user.address === 'object' && user.address 
                 ? `${user.address.street || ''} ${user.address.city || ''} ${user.address.district || ''}`.trim() 
                 : user.address}
@@ -126,7 +154,7 @@ export default function EditProfilePage() {
           className="save-btn"
         >
           <Save size={20} />
-          পরিবর্তন সেভ করুন
+          {loading ? 'সেভ হচ্ছে...' : 'পরিবর্তন সেভ করুন'}
         </button>
       </form>
     </div>
