@@ -23,6 +23,11 @@ const customerSchema = new mongoose.Schema(
         phone: {
             type: String,
         },
+        
+        image: {
+            type: String,
+            default: "https://media.istockphoto.com/id/1332100919/vector/man-icon-black-icon-person-symbol.jpg",
+        },
 
         // Authentication
         password: {
