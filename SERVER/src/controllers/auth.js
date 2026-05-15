@@ -97,36 +97,43 @@ const sendEmailOtp = async (email, otp) => {
 // Utility to send WhatsApp OTP
 const sendWhatsappOtp = async (phone, otp) => {
     try {
-        // Replace with your actual WhatsApp API credentials (e.g., Twilio, GreenAPI, Meta)
-        const WHATSAPP_API_URL = process.env.WHATSAPP_API_URL || 'https://graph.facebook.com/v25.0/1086660437872099/messages';
-        const WHATSAPP_API_TOKEN = process.env.WHATSAPP_API_TOKEN || 'your-whatsapp-access-token';
+        const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || 'your-account-sid';
+        const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || 'your-auth-token';
+        const TWILIO_WHATSAPP_NUMBER = process.env.TWILIO_WHATSAPP_NUMBER || 'your-twilio-whatsapp-number';
         
-        console.log(`Sending WhatsApp OTP ${otp} to ${phone}`);
+        console.log(`Sending Twilio WhatsApp OTP ${otp} to ${phone}`);
         
-        // Ensure the phone number format is correct (e.g. without the '+' if present)
-        const formattedPhone = phone.startsWith('+') ? phone.substring(1) : phone;
-
-        await axios.post(WHATSAPP_API_URL, {
-            messaging_product: "whatsapp",
-            to: formattedPhone,
-            type: "template",
-            template: { 
-                name: "hello_world", 
-                language: { code: "en_US" } 
-                // Note: The hello_world template does not accept variables like the OTP.
-                // To send the OTP, you must create a custom template in the Meta developer portal.
-                // If you use a custom template, it would look like this:
-                // template: { name: "your_otp_template", language: { code: "en_US" }, components: [{ type: "body", parameters: [{ type: "text", text: otp }] }] }
+        // Ensure the phone number format is correct for Twilio (E.164 format)
+        let formattedPhone = phone.trim();
+        if (!formattedPhone.startsWith('+')) {
+            // If it starts with 01, it's a BD number, prepend +88
+            if (formattedPhone.startsWith('01')) {
+                formattedPhone = `+88${formattedPhone}`;
+            } else {
+                formattedPhone = `+${formattedPhone}`;
             }
-        }, {
-            headers: { 
-                'Authorization': `Bearer ${WHATSAPP_API_TOKEN}`,
-                'Content-Type': 'application/json'
+        }
+
+        console.log(`Sending Twilio WhatsApp OTP ${otp} to ${formattedPhone} (Original: ${phone})`);
+        
+        const auth = Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64');
+        const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
+
+        const params = new URLSearchParams();
+        params.append('To', `whatsapp:${formattedPhone}`);
+        params.append('From', `whatsapp:${TWILIO_WHATSAPP_NUMBER}`);
+        params.append('Body', `Your Mango Shop verification code is: ${otp}. Do not share this code with anyone.`);
+
+        const response = await axios.post(twilioUrl, params, {
+            headers: {
+                'Authorization': `Basic ${auth}`,
+                'Content-Type': 'application/x-www-form-urlencoded'
             }
         });
+        console.log(`Twilio WhatsApp success! Message SID: ${response.data.sid}`);
     } catch (error) {
-        console.error('Error sending WhatsApp message:', error.response?.data || error.message);
-        throw new Error(error.response?.data?.error?.message || 'WhatsApp message failed');
+        console.error('Error sending WhatsApp message (Twilio):', error.response?.data || error.message);
+        throw new Error(error.response?.data?.message || 'Twilio WhatsApp message failed');
     }
 };
 

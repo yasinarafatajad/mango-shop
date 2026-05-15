@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Mail, Lock, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle, Eye, EyeOff, Search, User as UserIcon, MessageCircle } from 'lucide-react';
 import '../Auth.css';
@@ -21,6 +21,17 @@ export default function ForgotPasswordPage() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
+    const [timer, setTimer] = useState(0);
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (timer > 0) {
+            interval = setInterval(() => {
+                setTimer((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [timer]);
 
     const handleSearchSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -60,9 +71,24 @@ export default function ForgotPasswordPage() {
             const response = await authForgotPassword(selectedCustomer.id, selectedMethod);
             if (response.success) {
                 setStep('otp');
+                setTimer(30);
             }
         } catch (err: any) {
             setError(err.message || 'OTP পাঠাতে ব্যর্থ হয়েছে');
+        }
+    };
+
+    const handleResend = async () => {
+        if (timer > 0) return;
+        setError('');
+        try {
+            const response = await authForgotPassword(selectedCustomer.id, selectedMethod!);
+            if (response.success) {
+                setTimer(30);
+                setOtp(['', '', '', '']);
+            }
+        } catch (err: any) {
+            setError(err.message || 'OTP পুনরায় পাঠাতে ব্যর্থ হয়েছে');
         }
     };
 
@@ -287,6 +313,31 @@ export default function ForgotPasswordPage() {
                     <button type="submit" className="auth-btn">
                         ভেরিফাই করুন <ShieldCheck size={20} />
                     </button>
+
+                    <div className="otp-footer" style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem' }}>
+                        {timer > 0 ? (
+                            <p style={{ color: '#6b7280' }}>আবার পাঠান ({timer}s)</p>
+                        ) : (
+                            <button 
+                                type="button" 
+                                onClick={handleResend} 
+                                className="resend-link"
+                                style={{ color: 'var(--primary-green)', fontWeight: 600, border: 'none', background: 'none', cursor: 'pointer' }}
+                            >
+                                OTP আবার পাঠান
+                            </button>
+                        )}
+                        
+                        <div style={{ marginTop: '1rem' }}>
+                            <button 
+                                type="button" 
+                                onClick={() => setStep('select-method')}
+                                style={{ color: '#6b7280', fontSize: '0.85rem', textDecoration: 'underline', border: 'none', background: 'none', cursor: 'pointer' }}
+                            >
+                                অন্য মাধ্যমে চেষ্টা করুন
+                            </button>
+                        </div>
+                    </div>
                 </form>
             )}
 
