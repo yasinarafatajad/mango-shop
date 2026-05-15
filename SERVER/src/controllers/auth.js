@@ -100,6 +100,7 @@ const sendWhatsappOtp = async (phone, otp) => {
         const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || 'your-account-sid';
         const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || 'your-auth-token';
         const TWILIO_WHATSAPP_NUMBER = process.env.TWILIO_WHATSAPP_NUMBER || 'your-twilio-whatsapp-number';
+        const TWILIO_CONTENT_SID = process.env.TWILIO_CONTENT_SID || 'HX229f5a04fd0510ce1b071852155d3e75';
         
         console.log(`Sending Twilio WhatsApp OTP ${otp} to ${phone}`);
         
@@ -122,7 +123,11 @@ const sendWhatsappOtp = async (phone, otp) => {
         const params = new URLSearchParams();
         params.append('To', `whatsapp:${formattedPhone}`);
         params.append('From', `whatsapp:${TWILIO_WHATSAPP_NUMBER}`);
-        params.append('Body', `Your Mango Shop verification code is: ${otp}. Do not share this code with anyone.`);
+        
+        // Use the official Twilio Content Template SID
+        params.append('ContentSid', TWILIO_CONTENT_SID);
+        // Pass the OTP into the template variables (mapping "1" to the otp)
+        params.append('ContentVariables', JSON.stringify({ "1": otp }));
 
         const response = await axios.post(twilioUrl, params, {
             headers: {
@@ -130,7 +135,7 @@ const sendWhatsappOtp = async (phone, otp) => {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         });
-        console.log(`Twilio WhatsApp success! Message SID: ${response.data.sid}`);
+        console.log(`Twilio WhatsApp Template success! Message SID: ${response.data.sid}`);
     } catch (error) {
         console.error('Error sending WhatsApp message (Twilio):', error.response?.data || error.message);
         throw new Error(error.response?.data?.message || 'Twilio WhatsApp message failed');
