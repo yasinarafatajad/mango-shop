@@ -35,8 +35,15 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
+        const identifier = typeof email === 'string' ? email.trim() : email;
 
-        const user = await customerModel.findOne({ email }).select('+password');
+        const user = await customerModel.findOne({
+            $or: [
+                { email: identifier },
+                { phone: identifier },
+                { fullName: identifier }
+            ]
+        }).select('+password');
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }

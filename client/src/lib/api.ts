@@ -165,3 +165,68 @@ export const uploadImage = async (file: File, folder: string = 'orders'): Promis
   }
   return data;
 };
+
+// --- Authentication Endpoints ---
+
+export const authSignup = async (userData: any): Promise<any> => {
+  const response = await fetch(`${API_URL}/auth/signup`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(userData),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Signup failed');
+  }
+  return data;
+};
+
+export const authLogin = async (credentials: any): Promise<any> => {
+  const response = await fetch(`${API_URL}/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(credentials),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Login failed');
+  }
+  return data;
+};
+
+export const authForgotPassword = async (email: string, newPassword?: string): Promise<any> => {
+  const response = await fetch(`${API_URL}/auth/forgot-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    // The server expects email and newPassword
+    body: JSON.stringify({ email, newPassword }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Forgot password failed');
+  }
+  return data;
+};
+
+export const authChangePassword = async (passwordData: any): Promise<any> => {
+  const response = await fetch(`${API_URL}/auth/change-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    // The server expects email, oldPassword, newPassword
+    body: JSON.stringify(passwordData),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Change password failed');
+  }
+  return data;
+};
+
