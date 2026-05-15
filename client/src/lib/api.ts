@@ -33,8 +33,14 @@ export const fetchProductById = async (id: string): Promise<Mango> => {
   return mapProductToMango(data);
 };
 
-export const fetchOrders = async (): Promise<Order[]> => {
-  const response = await fetch(`${API_URL}/getAllOrder`);
+export const fetchOrders = async (email?: string, phone?: string): Promise<Order[]> => {
+  let url = `${API_URL}/getAllOrder`;
+  const params = new URLSearchParams();
+  if (email) params.append('email', email);
+  if (phone) params.append('phone', phone);
+  if (params.toString()) url += `?${params.toString()}`;
+
+  const response = await fetch(url);
   if (!response.ok) {
     return [];
   }
