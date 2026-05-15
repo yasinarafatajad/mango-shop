@@ -113,6 +113,21 @@ export const fetchAllCustomers = async (): Promise<UserType[]> => {
   }));
 };
 
+export const updateCustomer = async (id: string, customerData: any): Promise<any> => {
+  const response = await fetch(`${API_URL}/updateCustomer/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(customerData),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Failed to update customer');
+  }
+  return data;
+};
+
 export const createOrder = async (orderData: any): Promise<any> => {
   const response = await fetch(`${API_URL}/addOrder`, {
     method: 'POST',

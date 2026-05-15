@@ -20,6 +20,7 @@ export interface Order {
 
 export interface UserType {
   id: string;
+  _id?: string;
   name?: string;
   fullName?: string;
   email: string;

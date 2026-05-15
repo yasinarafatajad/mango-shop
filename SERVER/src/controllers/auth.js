@@ -125,7 +125,8 @@ const sendWhatsappOtp = async (phone, otp) => {
             }
         });
     } catch (error) {
-        console.error('Error sending WhatsApp message:', error);
+        console.error('Error sending WhatsApp message:', error.response?.data || error.message);
+        throw new Error(error.response?.data?.error?.message || 'WhatsApp message failed');
     }
 };
 
@@ -190,8 +191,17 @@ export const forgotPassword = async (req, res) => {
         await user.save();
 
         if (method === 'whatsapp' && user.phone) {
-            await sendWhatsappOtp(user.phone, otp);
-            res.status(200).json({ success: true, message: 'OTP sent via WhatsApp' });
+            try {
+                await sendWhatsappOtp(user.phone, otp);
+                return res.status(200).json({ success: true, message: 'OTP sent via WhatsApp' });
+            } catch (whatsappError) {
+                console.error('WhatsApp failed, falling back to email if possible:', whatsappError.message);
+                if (user.email) {
+                    await sendEmailOtp(user.email, otp);
+                    return res.status(200).json({ success: true, message: 'WhatsApp failed, OTP sent via Email' });
+                }
+                return res.status(400).json({ success: false, message: `WhatsApp failed: ${whatsappError.message}` });
+            }
         } else if (user.email) {
             await sendEmailOtp(user.email, otp);
             res.status(200).json({ success: true, message: 'OTP sent via Email' });
