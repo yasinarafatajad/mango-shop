@@ -1,6 +1,6 @@
 import { Mango, Order, UserType } from "./type";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL+"/api/v1" || 'http://localhost:3001/api/v1';
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001') + "/api/v1";
 
 // Mapper to convert server product to client Mango type
 const mapProductToMango = (product: any): Mango => ({
