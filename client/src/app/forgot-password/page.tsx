@@ -2,34 +2,89 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Mail, Lock, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle, Eye, EyeOff, Search, User as UserIcon, MessageCircle } from 'lucide-react';
 import '../Auth.css';
-import { authForgotPassword } from '@/lib/api';
+import { authSearchCustomer, authForgotPassword, authResetPassword, authVerifyOtp } from '@/lib/api';
 
-type Step = 'email' | 'otp' | 'new-password' | 'success' | 'error';
+type Step = 'search' | 'select-account' | 'select-method' | 'otp' | 'new-password' | 'success' | 'error';
 
 export default function ForgotPasswordPage() {
-    const [step, setStep] = useState<Step>('email');
-    const [email, setEmail] = useState('');
-    const [otp, setOtp] = useState('');
+    const [step, setStep] = useState<Step>('search');
+    
+    const [query, setQuery] = useState('');
+    const [customers, setCustomers] = useState<any[]>([]);
+    const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+    const [selectedMethod, setSelectedMethod] = useState<'email' | 'whatsapp' | null>(null);
+    
+    const [otp, setOtp] = useState(['', '', '', '']);
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
 
-    const handleEmailSubmit = (e: React.FormEvent) => {
+    const handleSearchSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-        if (!email.includes('@')) {
-            setError('সঠিক ইমেইল দিন');
+        if (!query.trim()) {
+            setError('সঠিক ইউজারনেম, ইমেইল অথবা মোবাইল নম্বর দিন');
             return;
         }
-        setStep('otp');
+        
+        try {
+            const response = await authSearchCustomer(query.trim());
+            if (response.success && response.customers.length > 0) {
+                setCustomers(response.customers);
+                setStep('select-account');
+            } else {
+                setError('কোনো অ্যাকাউন্ট পাওয়া যায়নি');
+            }
+        } catch (err: any) {
+            setError(err.message || 'সার্চ ব্যর্থ হয়েছে');
+        }
     };
 
-    const handleOtpSubmit = (e: React.FormEvent) => {
+    const handleSelectAccount = (customer: any) => {
+        setSelectedCustomer(customer);
+        setStep('select-method');
+    };
+
+    const handleMethodSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setStep('new-password');
+        setError('');
+        if (!selectedMethod) {
+            setError('একটি মাধ্যম নির্বাচন করুন');
+            return;
+        }
+        
+        try {
+            const response = await authForgotPassword(selectedCustomer.id, selectedMethod);
+            if (response.success) {
+                setStep('otp');
+            }
+        } catch (err: any) {
+            setError(err.message || 'OTP পাঠাতে ব্যর্থ হয়েছে');
+        }
+    };
+
+    const handleOtpSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        if (otp.join('').length < 4) {
+            setError('সঠিক OTP দিন');
+            return;
+        }
+        
+        try {
+            const response = await authVerifyOtp({
+                customerId: selectedCustomer.id,
+                otp: otp.join('')
+            });
+            if (response.success) {
+                setStep('new-password');
+            }
+        } catch (err: any) {
+            setError(err.message || 'OTP যাচাই ব্যর্থ হয়েছে');
+        }
     };
 
     const handlePasswordSubmit = async (e: React.FormEvent) => {
@@ -45,7 +100,11 @@ export default function ForgotPasswordPage() {
         }
         
         try {
-            const response = await authForgotPassword(email, newPassword);
+            const response = await authResetPassword({ 
+                customerId: selectedCustomer.id, 
+                otp: otp.join(''), 
+                newPassword 
+            });
             if (response.success) {
                 setStep('success');
             }
@@ -58,16 +117,28 @@ export default function ForgotPasswordPage() {
     return (
         <div className="auth-page">
             <div className="auth-header">
-                {step === 'email' && (
+                {step === 'search' && (
                     <>
-                        <h1 className="auth-title">পাসওয়ার্ড রিসেট</h1>
-                        <p className="auth-subtitle">আপনার ইমেইল দিন, আমরা একটি OTP পাঠাবো</p>
+                        <h1 className="auth-title">অ্যাকাউন্ট খুঁজুন</h1>
+                        <p className="auth-subtitle">পাসওয়ার্ড রিসেট করতে আপনার ইউজারনেম, ইমেইল বা ফোন নম্বর দিন</p>
+                    </>
+                )}
+                {step === 'select-account' && (
+                    <>
+                        <h1 className="auth-title">অ্যাকাউন্ট নির্বাচন করুন</h1>
+                        <p className="auth-subtitle">নিচের তালিকা থেকে আপনার অ্যাকাউন্টটি বেছে নিন</p>
+                    </>
+                )}
+                {step === 'select-method' && (
+                    <>
+                        <h1 className="auth-title">ভেরিফিকেশন মাধ্যম</h1>
+                        <p className="auth-subtitle">OTP পাওয়ার জন্য মাধ্যম নির্বাচন করুন</p>
                     </>
                 )}
                 {step === 'otp' && (
                     <>
                         <h1 className="auth-title">OTP যাচাইকরণ</h1>
-                        <p className="auth-subtitle">আপনার ইমেইলে পাঠানো ৪ সংখ্যার কোডটি দিন</p>
+                        <p className="auth-subtitle">আপনার নির্বাচিত মাধ্যমে পাঠানো ৪ সংখ্যার কোডটি দিন</p>
                     </>
                 )}
                 {step === 'new-password' && (
@@ -78,105 +149,189 @@ export default function ForgotPasswordPage() {
                 )}
             </div>
 
-            {step === 'email' && (
-            <form className="auth-form" onSubmit={handleEmailSubmit}>
-                {error && <div className="error-message">{error}</div>}
-                <div className="form-group">
-                    <label className="form-label">ইমেইল</label>
-                    <div className="input-wrapper">
-                        <Mail className="input-icon" size={20} />
-                        <input
-                            type="email"
-                            className="form-input"
-                            placeholder="example@mail.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </div>
-                </div>
-                <button type="submit" className="auth-btn">
-                    OTP পাঠান <ArrowRight size={20} />
-                </button>
-            </form>
-        )}
-
-        {step === 'otp' && (
-            <form className="auth-form" onSubmit={handleOtpSubmit}>
-                {error && <div className="error-message">{error}</div>}
-                <div className="form-group">
-                    <label className="form-label">OTP কোড</label>
-                    <div className="otp-input-container">
-                        {[0, 1, 2, 3].map((i) => (
+            {step === 'search' && (
+                <form className="auth-form" onSubmit={handleSearchSubmit}>
+                    {error && <div className="error-message">{error}</div>}
+                    <div className="form-group">
+                        <label className="form-label">ইমেইল / মোবাইল / নাম</label>
+                        <div className="input-wrapper">
+                            <Search className="input-icon" size={20} />
                             <input
-                                key={i}
-                                type="tel"
-                                maxLength={1}
-                                className="otp-field"
+                                type="text"
+                                className="form-input"
+                                placeholder="আপনার ইউজারনেম"
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
                                 required
-                                onChange={(e) => {
-                                    if (e.target.value && i < 3) {
-                                        (e.target.parentElement?.children[i + 1] as HTMLInputElement)?.focus();
-                                    }
-                                }}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Backspace' && !otp[i] && i > 0) {
-                                        (e.currentTarget.parentElement?.children[i - 1] as HTMLInputElement)?.focus();
-                                    }
-                                }}
                             />
-                        ))}
+                        </div>
                     </div>
-                </div>
-                <button type="submit" className="auth-btn">
-                    ভেরিফাই করুন <ShieldCheck size={20} />
-                </button>
-                <p className="resend-text">কোড পাননি? <button type="button" className="text-btn">পুনরায় পাঠান</button></p>
-            </form>
-        )}
+                    <button type="submit" className="auth-btn">
+                        খুঁজুন <ArrowRight size={20} />
+                    </button>
+                </form>
+            )}
 
-        {step === 'new-password' && (
-            <form className="auth-form" onSubmit={handlePasswordSubmit}>
-                {error && <div className="error-message">{error}</div>}
-                <div className="form-group">
-                    <label className="form-label">নতুন পাসওয়ার্ড</label>
-                    <div className="input-wrapper">
-                        <Lock className="input-icon" size={20} />
-                        <input
-                            type={showPassword ? "text" : "password"}
-                            className="form-input"
-                            placeholder="••••••••"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            required
-                        />
-                        <button 
-                            type="button" 
-                            className="toggle-password"
-                            onClick={() => setShowPassword(!showPassword)}
+            {step === 'select-account' && (
+                <div className="auth-form" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {customers.map((customer) => (
+                        <div 
+                            key={customer.id} 
+                            onClick={() => handleSelectAccount(customer)}
+                            style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                padding: '1rem', 
+                                border: '1px solid #e5e7eb', 
+                                borderRadius: '0.5rem', 
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
                         >
-                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
-                    </div>
+                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', marginRight: '1rem', backgroundColor: '#f3f4f6', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                {customer.image ? (
+                                    <img src={customer.image} alt={customer.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ) : (
+                                    <UserIcon size={20} color="#9ca3af" />
+                                )}
+                            </div>
+                            <div style={{ flex: 1 }}>
+                                <div style={{ fontWeight: 600, color: '#1f2937' }}>{customer.fullName}</div>
+                                <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                                    {customer.email && <div>{customer.email}</div>}
+                                    {customer.phone && <div>{customer.phone}</div>}
+                                </div>
+                            </div>
+                            <ArrowRight size={20} color="#9ca3af" />
+                        </div>
+                    ))}
+                    <button onClick={() => setStep('search')} className="text-btn" style={{ marginTop: '1rem', textAlign: 'center' }}>
+                        অন্য অ্যাকাউন্ট খুঁজুন
+                    </button>
                 </div>
-                <div className="form-group">
-                    <label className="form-label">পাসওয়ার্ড নিশ্চিত করুন</label>
-                    <div className="input-wrapper">
-                        <Lock className="input-icon" size={20} />
-                        <input
-                            type={showPassword ? "text" : "password"}
-                            className="form-input"
-                            placeholder="••••••••"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                        />
+            )}
+
+            {step === 'select-method' && (
+                <form className="auth-form" onSubmit={handleMethodSubmit}>
+                    {error && <div className="error-message">{error}</div>}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+                        {selectedCustomer.hasEmail && (
+                            <label style={{ display: 'flex', alignItems: 'center', padding: '1rem', border: `2px solid ${selectedMethod === 'email' ? '#4ade80' : '#e5e7eb'}`, borderRadius: '0.5rem', cursor: 'pointer' }}>
+                                <input 
+                                    type="radio" 
+                                    name="method" 
+                                    value="email" 
+                                    checked={selectedMethod === 'email'} 
+                                    onChange={() => setSelectedMethod('email')}
+                                    style={{ marginRight: '1rem' }}
+                                />
+                                <Mail size={20} style={{ marginRight: '0.5rem', color: selectedMethod === 'email' ? '#4ade80' : '#9ca3af' }} />
+                                <span style={{ flex: 1 }}>ইমেইল</span>
+                            </label>
+                        )}
+                        {selectedCustomer.hasPhone && (
+                            <label style={{ display: 'flex', alignItems: 'center', padding: '1rem', border: `2px solid ${selectedMethod === 'whatsapp' ? '#4ade80' : '#e5e7eb'}`, borderRadius: '0.5rem', cursor: 'pointer' }}>
+                                <input 
+                                    type="radio" 
+                                    name="method" 
+                                    value="whatsapp" 
+                                    checked={selectedMethod === 'whatsapp'} 
+                                    onChange={() => setSelectedMethod('whatsapp')}
+                                    style={{ marginRight: '1rem' }}
+                                />
+                                <MessageCircle size={20} style={{ marginRight: '0.5rem', color: selectedMethod === 'whatsapp' ? '#4ade80' : '#9ca3af' }} />
+                                <span style={{ flex: 1 }}>হোয়াটসঅ্যাপ</span>
+                            </label>
+                        )}
                     </div>
-                </div>
-                <button type="submit" className="auth-btn">
-                    পাসওয়ার্ড আপডেট করুন <CheckCircle2 size={20} />
-                </button>
-            </form>
+                    <button type="submit" className="auth-btn">
+                        OTP পাঠান <ArrowRight size={20} />
+                    </button>
+                    <button type="button" onClick={() => setStep('select-account')} className="text-btn" style={{ marginTop: '1rem', display: 'block', width: '100%', textAlign: 'center' }}>
+                        ফিরে যান
+                    </button>
+                </form>
+            )}
+
+            {step === 'otp' && (
+                <form className="auth-form" onSubmit={handleOtpSubmit}>
+                    {error && <div className="error-message">{error}</div>}
+                    <div className="form-group">
+                        <label className="form-label">OTP কোড</label>
+                        <div className="otp-input-container">
+                            {[0, 1, 2, 3].map((i) => (
+                                <input
+                                    key={i}
+                                    type="tel"
+                                    maxLength={1}
+                                    className="otp-field"
+                                    required
+                                    value={otp[i]}
+                                    onChange={(e) => {
+                                        const newOtp = [...otp];
+                                        newOtp[i] = e.target.value;
+                                        setOtp(newOtp);
+                                        if (e.target.value && i < 3) {
+                                            (e.target.parentElement?.children[i + 1] as HTMLInputElement)?.focus();
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Backspace' && !otp[i] && i > 0) {
+                                            (e.currentTarget.parentElement?.children[i - 1] as HTMLInputElement)?.focus();
+                                        }
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                    <button type="submit" className="auth-btn">
+                        ভেরিফাই করুন <ShieldCheck size={20} />
+                    </button>
+                </form>
+            )}
+
+            {step === 'new-password' && (
+                <form className="auth-form" onSubmit={handlePasswordSubmit}>
+                    {error && <div className="error-message">{error}</div>}
+                    <div className="form-group">
+                        <label className="form-label">নতুন পাসওয়ার্ড</label>
+                        <div className="input-wrapper">
+                            <Lock className="input-icon" size={20} />
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                className="form-input"
+                                placeholder="••••••••"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                required
+                            />
+                            <button 
+                                type="button" 
+                                className="toggle-password"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <label className="form-label">পাসওয়ার্ড নিশ্চিত করুন</label>
+                        <div className="input-wrapper">
+                            <Lock className="input-icon" size={20} />
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                className="form-input"
+                                placeholder="••••••••"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                required
+                            />
+                        </div>
+                    </div>
+                    <button type="submit" className="auth-btn">
+                        পাসওয়ার্ড আপডেট করুন <CheckCircle2 size={20} />
+                    </button>
+                </form>
             )}
 
             {step === 'success' && (
@@ -195,7 +350,7 @@ export default function ForgotPasswordPage() {
                     <AlertCircle size={80} className="status-icon" />
                     <h2 className="status-title">ব্যর্থ হয়েছে!</h2>
                     <p className="status-text">দুঃখিত, পাসওয়ার্ড রিসেট করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।</p>
-                    <button onClick={() => setStep('email')} className="auth-btn">
+                    <button onClick={() => setStep('search')} className="auth-btn">
                         আবার চেষ্টা করুন
                     </button>
                 </div>

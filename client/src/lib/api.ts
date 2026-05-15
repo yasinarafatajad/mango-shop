@@ -198,14 +198,22 @@ export const authLogin = async (credentials: any): Promise<any> => {
   return data;
 };
 
-export const authForgotPassword = async (email: string, newPassword?: string): Promise<any> => {
+export const authSearchCustomer = async (query: string): Promise<any> => {
+  const response = await fetch(`${API_URL}/auth/search-customer?query=${encodeURIComponent(query)}`);
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Search failed');
+  }
+  return data;
+};
+
+export const authForgotPassword = async (customerId: string, method: 'email' | 'whatsapp'): Promise<any> => {
   const response = await fetch(`${API_URL}/auth/forgot-password`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    // The server expects email and newPassword
-    body: JSON.stringify({ email, newPassword }),
+    body: JSON.stringify({ customerId, method }),
   });
   const data = await response.json();
   if (!response.ok) {
@@ -220,7 +228,6 @@ export const authChangePassword = async (passwordData: any): Promise<any> => {
     headers: {
       'Content-Type': 'application/json',
     },
-    // The server expects email, oldPassword, newPassword
     body: JSON.stringify(passwordData),
   });
   const data = await response.json();
@@ -230,3 +237,32 @@ export const authChangePassword = async (passwordData: any): Promise<any> => {
   return data;
 };
 
+export const authVerifyOtp = async (verifyData: { customerId: string, otp: string }): Promise<any> => {
+  const response = await fetch(`${API_URL}/auth/verify-otp`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(verifyData),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'OTP verification failed');
+  }
+  return data;
+};
+
+export const authResetPassword = async (resetData: { customerId: string, otp: string, newPassword: string }): Promise<any> => {
+  const response = await fetch(`${API_URL}/auth/reset-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(resetData),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Reset password failed');
+  }
+  return data;
+};
