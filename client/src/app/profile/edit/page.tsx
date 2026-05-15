@@ -22,17 +22,11 @@ export default function EditProfilePage() {
   const router = useRouter();
 
   useEffect(() => {
-    fetchAllCustomers()
-      .then(customers => {
-        if (customers.length > 0) {
-          setUser(customers[0]);
-        }
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+    const savedUser = localStorage.getItem('mango_user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+    setLoading(false);
   }, []);
 
   const handleSave = (e: React.FormEvent) => {
@@ -64,7 +58,7 @@ export default function EditProfilePage() {
           <div className="avatar-edit-img">
             <Image 
               src={user.image} 
-              alt={user.name} 
+              alt={user.name || ''} 
               fill 
               className="object-cover"
             />
@@ -83,7 +77,7 @@ export default function EditProfilePage() {
             <User className="input-icon" size={18} />
             <input 
               type="text" 
-              defaultValue={user.name}
+              defaultValue={user.name || user.fullName}
               className="form-input"
             />
           </div>
@@ -118,7 +112,9 @@ export default function EditProfilePage() {
           <div className="input-wrapper">
             <MapPin className="input-icon top" size={18} />
             <textarea 
-              defaultValue={user.address}
+              defaultValue={typeof user.address === 'object' && user.address 
+                ? `${user.address.street || ''} ${user.address.city || ''} ${user.address.district || ''}`.trim() 
+                : user.address}
               rows={3}
               className="form-input form-textarea"
             />

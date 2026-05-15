@@ -55,7 +55,9 @@ export default function RegisterPage() {
                     image: imageUrl || undefined
                 });
                 if (response.success) {
-                    window.location.href = '/login';
+                    localStorage.setItem('mango_user', JSON.stringify(response.user));
+                    localStorage.setItem('mango_token', response.token);
+                    window.location.href = '/';
                 }
             } catch (err: any) {
                 setError(err.message || 'রেজিস্ট্রেশন ব্যর্থ হয়েছে');

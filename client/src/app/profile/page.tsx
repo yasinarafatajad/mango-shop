@@ -24,19 +24,18 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // For demonstration, fetching the first customer
-    fetchAllCustomers()
-      .then(customers => {
-        if (customers.length > 0) {
-          setUser(customers[0]);
-        }
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+    const savedUser = localStorage.getItem('mango_user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+    setLoading(false);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('mango_user');
+    localStorage.removeItem('mango_token');
+    window.location.href = '/login';
+  };
 
   if (loading) return <div className="loading-state">প্রোফাইল লোড হচ্ছে...</div>;
 
@@ -63,13 +62,13 @@ export default function ProfilePage() {
           <div className="avatar-wrapper">
             <Image 
               src={user.image} 
-              alt={user.name} 
+              alt={user.name || ''} 
               fill 
               className="object-cover"
             />
           </div>
           <div className="user-name-role">
-            <h2>{user.name}</h2>
+            <h2>{user.name || user.fullName}</h2>
             <p>
               <span className="role-tag">{user.role}</span> অ্যাকাউন্ট
             </p>
@@ -115,7 +114,11 @@ export default function ProfilePage() {
             </div>
             <div className="info-content">
               <p>ঠিকানা</p>
-              <p>{user.address || 'N/A'}</p>
+              <p>
+                {typeof user.address === 'object' && user.address 
+                  ? `${user.address.street || ''} ${user.address.city || ''} ${user.address.district || ''}`.trim() || 'N/A'
+                  : user.address || 'N/A'}
+              </p>
             </div>
           </div>
           <div className="info-item">
@@ -124,14 +127,16 @@ export default function ProfilePage() {
             </div>
             <div className="info-content">
               <p>জয়েন করেছেন</p>
-              <p>{user.joinDate}</p>
+              <p>
+                {user.joinDate || (user.createdAt ? new Date(user.createdAt).toLocaleDateString('bn-BD', { year: 'numeric', month: 'long' }) : 'N/A')}
+              </p>
             </div>
           </div>
         </div>
       </div>
 
       <div className="logout-btn-container">
-        <button className="logout-btn">
+        <button className="logout-btn" onClick={handleLogout}>
           <div className="logout-btn-left">
             <div className="logout-icon-box">
               <LogOut size={20} />

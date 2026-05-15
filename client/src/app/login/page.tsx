@@ -31,7 +31,8 @@ export default function LoginPage() {
             try {
                 const response = await authLogin({ email: email.trim(), password });
                 if (response.success) {
-                    // Save token if needed, or redirect
+                    localStorage.setItem('mango_user', JSON.stringify(response.user));
+                    localStorage.setItem('mango_token', response.token);
                     window.location.href = '/';
                 }
             } catch (err: any) {

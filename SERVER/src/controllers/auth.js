@@ -84,7 +84,7 @@ const sendEmailOtp = async (email, otp) => {
             from: process.env.EMAIL_USER || 'your-email@gmail.com',
             to: email,
             subject: 'Password Reset OTP - Mango Shop',
-            text: `Your OTP for password reset is: ${otp}. It is valid for 10 minutes.`
+            text: `Your OTP for password reset is: ${otp}. It is valid for 5 minutes.`
         };
 
         await transporter.sendMail(mailOptions);
@@ -186,7 +186,7 @@ export const forgotPassword = async (req, res) => {
         const otp = Math.floor(1000 + Math.random() * 9000).toString();
         
         user.resetPasswordOtp = otp;
-        user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+        user.resetPasswordExpires = Date.now() + 5 * 60 * 1000; // 10 minutes
         await user.save();
 
         if (method === 'whatsapp' && user.phone) {

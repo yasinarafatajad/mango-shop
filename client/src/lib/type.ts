@@ -14,17 +14,25 @@ export interface Order {
   id: string;
   date: string;
   total: number;
-  status: 'pending' | 'processing' | 'delivered';
+  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
   items: Mango[];
 }
 
 export interface UserType {
   id: string;
-  name: string;
+  name?: string;
+  fullName?: string;
   email: string;
   phone: string;
   role: 'admin' | 'customer';
   image: string;
-  address?: string;
-  joinDate: string;
+  address?: string | {
+    street?: string;
+    city?: string;
+    district?: string;
+    postalCode?: string;
+    country?: string;
+  };
+  joinDate?: string;
+  createdAt?: string;
 }
