@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { updateCustomer } from "@/lib/api";
+import { useEffect, useState, useRef } from "react";
+import { updateCustomer, uploadImage } from "@/lib/api";
 import { UserType } from "@/lib/type";
 import { 
   ChevronLeft, 
@@ -21,13 +21,31 @@ export default function EditProfilePage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     const savedUser = localStorage.getItem('mango_user');
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      const parsedUser = JSON.parse(savedUser);
+      setUser(parsedUser);
+      setImagePreview(parsedUser.image || "");
     }
     setLoading(false);
   }, []);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,11 +59,19 @@ export default function EditProfilePage() {
     const address = formData.get('address') as string;
 
     try {
+      let imageUrl = user.image;
+
+      if (selectedFile) {
+        const uploadRes = await uploadImage(selectedFile, 'customers');
+        imageUrl = uploadRes.url;
+      }
+
       const response = await updateCustomer(user.id || (user as any)._id, {
         fullName,
         email,
         phone,
-        address
+        address,
+        image: imageUrl
       });
       
       if (response.success) {
@@ -81,13 +107,24 @@ export default function EditProfilePage() {
         <div className="avatar-edit-wrapper">
           <div className="avatar-edit-img">
             <Image 
-              src={user.image} 
+              src={imagePreview || user.image || "/default-avatar.png"} 
               alt={user.name || ''} 
               fill 
               className="object-cover"
             />
           </div>
-          <button className="camera-btn">
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleImageChange} 
+            accept="image/*" 
+            style={{ display: 'none' }} 
+          />
+          <button 
+            type="button"
+            className="camera-btn" 
+            onClick={() => fileInputRef.current?.click()}
+          >
             <Camera size={14} />
           </button>
         </div>
