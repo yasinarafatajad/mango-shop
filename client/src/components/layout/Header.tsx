@@ -24,7 +24,13 @@ export default function Header() {
   const [allProducts, setAllProducts] = useState<Mango[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const user = localStorage.getItem('mango_user');
+    setIsLoggedIn(!!user);
+  }, []);
 
   useEffect(() => {
     fetchProducts().then(setAllProducts).catch(console.error);
@@ -125,9 +131,9 @@ export default function Header() {
               {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
             </Link>
 
-            {/* Login */}
-            <Link href="/login" className="cart-btn" style={{ background: '#f5f5f5', borderRadius: '50%', width: '40px', height: '40px', justifyContent: 'center', alignItems: 'center' }}>
-              <User size={22} color="#666" />
+            {/* Profile/Login */}
+            <Link href={isLoggedIn ? "/profile" : "/login"} className="cart-btn" style={{ background: '#f5f5f5', borderRadius: '50%', width: '40px', height: '40px', justifyContent: 'center', alignItems: 'center' }}>
+              <User size={22} color={isLoggedIn ? "#22c55e" : "#666"} />
             </Link>
           </div>
         </div>
@@ -138,7 +144,9 @@ export default function Header() {
           <Link href="/all-products" className="desktop-nav-link">সব আম</Link>
           <Link href="/my-orders" className="desktop-nav-link">আমার অর্ডার</Link>
           <Link href="/wishlist" className="desktop-nav-link">পছন্দের তালিকা</Link>
-          <Link href="/profile" className="desktop-nav-link">প্রোফাইল</Link>
+          <Link href={isLoggedIn ? "/profile" : "/login"} className="desktop-nav-link">
+            {isLoggedIn ? "প্রোফাইল" : "লগইন"}
+          </Link>
         </nav>
       </div>
     </header>

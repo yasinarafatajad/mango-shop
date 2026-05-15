@@ -52,6 +52,19 @@ export default function Checkout() {
     useEffect(() => {
         setCartItems(getCart());
         
+        const savedUser = localStorage.getItem('mango_user');
+        if (savedUser) {
+            const user = JSON.parse(savedUser);
+            setFullName(user.name || user.fullName || '');
+            setPhone(user.phone || '');
+            const addr = user.address;
+            if (typeof addr === 'object' && addr) {
+                setAddress(`${addr.street || ''} ${addr.city || ''} ${addr.district || ''}`.trim());
+            } else {
+                setAddress(addr || '');
+            }
+        }
+        
         fetchActiveDeliveryCharges()
             .then(charges => {
                 if (charges && charges.length > 0) {
