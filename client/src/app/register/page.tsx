@@ -2,14 +2,17 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { User, Mail, Lock, ArrowRight, Phone, Eye, EyeOff } from 'lucide-react';
+import { User, Mail, Lock, ArrowRight, Phone, Eye, EyeOff, ImagePlus } from 'lucide-react';
 import '../Auth.css';
+import { authSignup, uploadImage } from '@/lib/api';
 
 export default function RegisterPage() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
+    const [image, setImage] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
 
@@ -33,12 +36,30 @@ export default function RegisterPage() {
         return true;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         if (validate()) {
-            console.log('Registration attempt:', { name, email, phone, password });
-            // Handle registration logic
+            try {
+                let imageUrl = '';
+                if (image) {
+                    const uploadRes = await uploadImage(image, 'customers');
+                    imageUrl = uploadRes.url || uploadRes.secure_url || '';
+                }
+                
+                const response = await authSignup({ 
+                    fullName: name, 
+                    email, 
+                    phone, 
+                    password,
+                    image: imageUrl || undefined
+                });
+                if (response.success) {
+                    window.location.href = '/login';
+                }
+            } catch (err: any) {
+                setError(err.message || 'রেজিস্ট্রেশন ব্যর্থ হয়েছে');
+            }
         }
     };
 
@@ -51,6 +72,48 @@ export default function RegisterPage() {
 
             <form className="auth-form" onSubmit={handleSubmit}>
                 {error && <div className="error-message">{error}</div>}
+
+                <div className="image-upload-wrapper" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <div 
+                        className="image-preview" 
+                        style={{ 
+                            width: '100px', 
+                            height: '100px', 
+                            borderRadius: '50%', 
+                            backgroundColor: '#f3f4f6', 
+                            display: 'flex', 
+                            justifyContent: 'center', 
+                            alignItems: 'center',
+                            overflow: 'hidden',
+                            cursor: 'pointer',
+                            border: '2px dashed #d1d5db',
+                            position: 'relative'
+                        }}
+                        onClick={() => document.getElementById('profile-image-upload')?.click()}
+                    >
+                        {imagePreview ? (
+                            <img src={imagePreview} alt="Profile preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                            <ImagePlus size={32} color="#9ca3af" />
+                        )}
+                    </div>
+                    <label style={{ marginTop: '0.5rem', cursor: 'pointer', color: '#4b5563', fontSize: '0.875rem' }} onClick={() => document.getElementById('profile-image-upload')?.click()}>
+                        প্রোফাইল ছবি যোগ করুন
+                    </label>
+                    <input 
+                        id="profile-image-upload" 
+                        type="file" 
+                        accept="image/*" 
+                        style={{ display: 'none' }} 
+                        onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                                setImage(file);
+                                setImagePreview(URL.createObjectURL(file));
+                            }
+                        }} 
+                    />
+                </div>
 
                 <div className="form-group">
                     <label className="form-label">পুরো নাম</label>

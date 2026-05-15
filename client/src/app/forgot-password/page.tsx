@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Mail, Lock, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import '../Auth.css';
+import { authForgotPassword } from '@/lib/api';
 
 type Step = 'email' | 'otp' | 'new-password' | 'success' | 'error';
 
@@ -31,7 +32,7 @@ export default function ForgotPasswordPage() {
         setStep('new-password');
     };
 
-    const handlePasswordSubmit = (e: React.FormEvent) => {
+    const handlePasswordSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         if (newPassword.length < 6) {
@@ -42,7 +43,16 @@ export default function ForgotPasswordPage() {
             setError('পাসওয়ার্ড দুটি মেলেনি');
             return;
         }
-        setStep('success');
+        
+        try {
+            const response = await authForgotPassword(email, newPassword);
+            if (response.success) {
+                setStep('success');
+            }
+        } catch (err: any) {
+            setError(err.message || 'পাসওয়ার্ড রিসেট ব্যর্থ হয়েছে');
+            setStep('error');
+        }
     };
 
     return (

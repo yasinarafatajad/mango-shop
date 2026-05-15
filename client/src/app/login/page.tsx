@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import '../Auth.css';
+import { authLogin } from '@/lib/api';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -12,8 +13,8 @@ export default function LoginPage() {
     const [error, setError] = useState('');
 
     const validate = () => {
-        if (!email.includes('@')) {
-            setError('সঠিক ইমেইল দিন');
+        if (!email.trim()) {
+            setError('সঠিক ইউজারনেম, ইমেইল অথবা মোবাইল নম্বর দিন');
             return false;
         }
         if (password.length < 6) {
@@ -23,12 +24,19 @@ export default function LoginPage() {
         return true;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         if (validate()) {
-            console.log('Login attempt:', { email, password });
-            // Handle login logic
+            try {
+                const response = await authLogin({ email: email.trim(), password });
+                if (response.success) {
+                    // Save token if needed, or redirect
+                    window.location.href = '/';
+                }
+            } catch (err: any) {
+                setError(err.message || 'লগইন ব্যর্থ হয়েছে');
+            }
         }
     };
 
@@ -43,13 +51,13 @@ export default function LoginPage() {
                 {error && <div className="error-message">{error}</div>}
                 
                 <div className="form-group">
-                    <label className="form-label">ইমেইল</label>
+                    <label className="form-label">ইমেইল / মোবাইল / নাম</label>
                     <div className="input-wrapper">
                         <Mail className="input-icon" size={20} />
                         <input
-                            type="email"
+                            type="text"
                             className="form-input"
-                            placeholder="example@mail.com"
+                            placeholder="আপনার ইউজারনেম"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
