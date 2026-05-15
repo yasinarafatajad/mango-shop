@@ -12,15 +12,21 @@ export default function MyOrders() {
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    fetchOrders()
-      .then(data => {
-        setOrders(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+    const savedUser = localStorage.getItem('mango_user');
+    if (savedUser) {
+      const user = JSON.parse(savedUser);
+      fetchOrders(user.email, user.phone)
+        .then(data => {
+          setOrders(data);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error(err);
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   const getStatusLabel = (status: string) => {
