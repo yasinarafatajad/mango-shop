@@ -132,7 +132,7 @@ export default function Header() {
             </Link>
 
             {/* Profile/Login */}
-            <Link href={isLoggedIn ? "/profile" : "/login"} className="cart-btn" style={{ background: '#f5f5f5', borderRadius: '50%', width: '40px', height: '40px', justifyContent: 'center', alignItems: 'center' }}>
+            <Link href={isLoggedIn ? "/profile" : "/login"} className="cart-btn header-profile-btn" style={{ background: '#f5f5f5', borderRadius: '50%', width: '40px', height: '40px', justifyContent: 'center', alignItems: 'center' }}>
               <User size={22} color={isLoggedIn ? "#22c55e" : "#666"} />
             </Link>
           </div>

@@ -1,18 +1,25 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Home, ShoppingBag, Heart, User, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const user = localStorage.getItem('mango_user');
+    setIsLoggedIn(!!user);
+  }, []);
 
   const navItems = [
     { icon: Home, label: 'হোম', path: '/' },
     { icon: LayoutGrid, label: 'সব পণ্য', path: '/all-products' },
     { icon: ShoppingBag, label: 'আমার অর্ডার', path: '/my-orders' },
     { icon: Heart, label: 'পছন্দ', path: '/wishlist' },
-    { icon: User, label: 'প্রোফাইল', path: '/profile' },
+    { icon: User, label: 'প্রোফাইল', path: isLoggedIn ? '/profile' : '/login' },
   ];
 
   return (
