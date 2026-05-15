@@ -37,6 +37,14 @@ const customerSchema = new mongoose.Schema(
             minlength: 6,
             select: false, // Do not return password by default
         },
+        
+        resetPasswordOtp: {
+            type: String,
+        },
+        
+        resetPasswordExpires: {
+            type: Date,
+        },
 
         role: {
             type: String,

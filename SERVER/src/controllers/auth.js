@@ -1,6 +1,8 @@
 import customerModel from '../models/customer.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import 'nodemailer';
+import 'axios';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretjwtkey';
 
@@ -64,17 +66,183 @@ export const login = async (req, res) => {
     }
 };
 
+import nodemailer from 'nodemailer';
+import axios from 'axios';
+
+// Utility to send email OTP
+const sendEmailOtp = async (email, otp) => {
+    try {
+        const transporter = nodemailer.createTransport({
+            service: 'gmail', // Use your email provider
+            auth: {
+                user: process.env.EMAIL_USER || 'your-email@gmail.com',
+                pass: process.env.EMAIL_PASS || 'your-app-password'
+            }
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'your-email@gmail.com',
+            to: email,
+            subject: 'Password Reset OTP - Mango Shop',
+            text: `Your OTP for password reset is: ${otp}. It is valid for 10 minutes.`
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`Email sent to ${email}`);
+    } catch (error) {
+        console.error('Error sending email:', error);
+    }
+};
+
+// Utility to send WhatsApp OTP
+const sendWhatsappOtp = async (phone, otp) => {
+    try {
+        // Replace with your actual WhatsApp API credentials (e.g., Twilio, GreenAPI, Meta)
+        const WHATSAPP_API_URL = process.env.WHATSAPP_API_URL || 'https://graph.facebook.com/v25.0/1086660437872099/messages';
+        const WHATSAPP_API_TOKEN = process.env.WHATSAPP_API_TOKEN || 'your-whatsapp-access-token';
+        
+        console.log(`Sending WhatsApp OTP ${otp} to ${phone}`);
+        
+        // Ensure the phone number format is correct (e.g. without the '+' if present)
+        const formattedPhone = phone.startsWith('+') ? phone.substring(1) : phone;
+
+        await axios.post(WHATSAPP_API_URL, {
+            messaging_product: "whatsapp",
+            to: formattedPhone,
+            type: "template",
+            template: { 
+                name: "hello_world", 
+                language: { code: "en_US" } 
+                // Note: The hello_world template does not accept variables like the OTP.
+                // To send the OTP, you must create a custom template in the Meta developer portal.
+                // If you use a custom template, it would look like this:
+                // template: { name: "your_otp_template", language: { code: "en_US" }, components: [{ type: "body", parameters: [{ type: "text", text: otp }] }] }
+            }
+        }, {
+            headers: { 
+                'Authorization': `Bearer ${WHATSAPP_API_TOKEN}`,
+                'Content-Type': 'application/json'
+            }
+        });
+    } catch (error) {
+        console.error('Error sending WhatsApp message:', error);
+    }
+};
+
+// Search customer by identifier
+export const searchCustomer = async (req, res) => {
+    try {
+        const { query } = req.query;
+        if (!query) {
+            return res.status(400).json({ success: false, message: 'Search query is required' });
+        }
+
+        const regex = new RegExp(query, 'i');
+        const customers = await customerModel.find({
+            $or: [
+                { email: regex },
+                { phone: regex },
+                { fullName: regex }
+            ]
+        }).select('_id email phone fullName image');
+
+        // Masking data for security
+        const maskedCustomers = customers.map(c => {
+            const maskedEmail = c.email ? c.email.replace(/(.{2})(.*)(?=@)/, (gp1, gp2, gp3) => { 
+                return gp2 + gp3.replace(/./g, '*'); 
+            }) : null;
+            
+            const maskedPhone = c.phone ? c.phone.replace(/.(?=.{4})/g, '*') : null;
+
+            return {
+                id: c._id,
+                fullName: c.fullName,
+                email: maskedEmail,
+                phone: maskedPhone,
+                image: c.image,
+                hasEmail: !!c.email,
+                hasPhone: !!c.phone
+            };
+        });
+
+        res.status(200).json({ success: true, customers: maskedCustomers });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 export const forgotPassword = async (req, res) => {
     try {
-        const { email, newPassword } = req.body;
+        const { customerId, method } = req.body; // method is 'email' or 'whatsapp'
 
-        const user = await customerModel.findOne({ email });
+        const user = await customerModel.findById(customerId);
+
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
+        // Generate 4 digit OTP
+        const otp = Math.floor(1000 + Math.random() * 9000).toString();
+        
+        user.resetPasswordOtp = otp;
+        user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+        await user.save();
+
+        if (method === 'whatsapp' && user.phone) {
+            await sendWhatsappOtp(user.phone, otp);
+            res.status(200).json({ success: true, message: 'OTP sent via WhatsApp' });
+        } else if (user.email) {
+            await sendEmailOtp(user.email, otp);
+            res.status(200).json({ success: true, message: 'OTP sent via Email' });
+        } else {
+            return res.status(400).json({ success: false, message: 'User does not have required contact method' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export const verifyOtp = async (req, res) => {
+    try {
+        const { customerId, otp } = req.body;
+
+        const user = await customerModel.findOne({
+            _id: customerId,
+            resetPasswordOtp: otp,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
+        }
+
+        res.status(200).json({ success: true, message: 'OTP verified successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export const resetPassword = async (req, res) => {
+    try {
+        const { customerId, otp, newPassword } = req.body;
+
+        const user = await customerModel.findOne({
+            _id: customerId,
+            resetPasswordOtp: otp,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
+        }
+
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedPassword;
+        user.resetPasswordOtp = undefined;
+        user.resetPasswordExpires = undefined;
         await user.save();
 
         res.status(200).json({ success: true, message: 'Password reset successful' });
