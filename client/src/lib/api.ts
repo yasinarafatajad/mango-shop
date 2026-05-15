@@ -1,6 +1,6 @@
 import { Mango, Order, UserType } from "./type";
 
-const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001') + "/api/v1";
+const API_URL = (process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '') || 'http://localhost:3001') + "/api/v1";
 
 // Mapper to convert server product to client Mango type
 const mapProductToMango = (product: any): Mango => ({
@@ -124,6 +124,7 @@ export const updateCustomer = async (id: string, customerData: any): Promise<any
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     },
     body: JSON.stringify(customerData),
   });
@@ -139,6 +140,7 @@ export const createOrder = async (orderData: any): Promise<any> => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     },
     body: JSON.stringify(orderData),
   });
@@ -153,6 +155,7 @@ export const applyCoupon = async (code: string, orderAmount: number): Promise<an
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     },
     body: JSON.stringify({ code, orderAmount }),
   });
@@ -194,6 +197,7 @@ export const authSignup = async (userData: any): Promise<any> => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     },
     body: JSON.stringify(userData),
   });
@@ -209,6 +213,7 @@ export const authLogin = async (credentials: any): Promise<any> => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     },
     body: JSON.stringify(credentials),
   });
@@ -233,6 +238,7 @@ export const authForgotPassword = async (customerId: string, method: 'email' | '
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     },
     body: JSON.stringify({ customerId, method }),
   });
@@ -248,6 +254,7 @@ export const authChangePassword = async (passwordData: any): Promise<any> => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     },
     body: JSON.stringify(passwordData),
   });
@@ -263,6 +270,7 @@ export const authVerifyOtp = async (verifyData: { customerId: string, otp: strin
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     },
     body: JSON.stringify(verifyData),
   });
@@ -278,6 +286,7 @@ export const authResetPassword = async (resetData: { customerId: string, otp: st
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     },
     body: JSON.stringify(resetData),
   });
