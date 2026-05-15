@@ -209,6 +209,10 @@
   margin-top: 2px;
 }
 
+.header-profile-btn {
+  display: none !important;
+}
+
 /* Desktop Navbar */
 .desktop-navbar {
   display: none;
@@ -248,5 +252,9 @@
 
   .icons-group {
     order: 3;
+  }
+
+  .header-profile-btn {
+    display: flex !important;
   }
 }
