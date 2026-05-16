@@ -15,6 +15,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import "../profile.css";
+import "../../Auth.css";
 
 export default function EditProfilePage() {
   const [user, setUser] = useState<UserType | null>(null);
@@ -91,109 +92,131 @@ export default function EditProfilePage() {
   if (!user) return <div className="empty-state">ব্যবহারকারী পাওয়া যায়নি।</div>;
 
   return (
-    <div className="profile-container animate-in">
-      <div className="edit-header">
-        <button 
-          onClick={() => router.back()} 
-          className="back-btn"
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <h1>প্রোফাইল এডিট</h1>
-        <div style={{ width: '40px' }} />
+    <div className="auth-container">
+      <div className="auth-form-section">
+        <div className="edit-profile-wrapper animate-in">
+          <div className="edit-header">
+            <button 
+              onClick={() => router.back()} 
+              className="back-btn"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <h1>প্রোফাইল এডিট</h1>
+            <div style={{ width: '40px' }} />
+          </div>
+
+          <div className="avatar-edit-section">
+            <div className="avatar-edit-wrapper">
+              <div className="avatar-edit-img">
+                <Image 
+                  src={imagePreview || user.image || "/default-avatar.png"} 
+                  alt={user.name || ''} 
+                  fill 
+                  className="object-cover"
+                />
+              </div>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleImageChange} 
+                accept="image/*" 
+                style={{ display: 'none' }} 
+              />
+              <button 
+                type="button"
+                className="camera-btn" 
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Camera size={14} />
+              </button>
+            </div>
+            <p className="avatar-edit-label">প্রোফাইল ছবি পরিবর্তন করুন</p>
+          </div>
+
+          <form onSubmit={handleSave} className="edit-form">
+            <div className="form-group">
+              <label className="form-label">পুরো নাম</label>
+              <div className="input-wrapper">
+                <User className="input-icon" size={18} />
+                <input 
+                  type="text" 
+                  name="fullName"
+                  defaultValue={user.name || user.fullName}
+                  className="form-input"
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">ইমেইল ঠিকানা</label>
+              <div className="input-wrapper">
+                <Mail className="input-icon" size={18} />
+                <input 
+                  type="email" 
+                  name="email"
+                  defaultValue={user.email}
+                  className="form-input"
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">ফোন নম্বর</label>
+              <div className="input-wrapper">
+                <Phone className="input-icon" size={18} />
+                <input 
+                  type="tel" 
+                  name="phone"
+                  defaultValue={user.phone}
+                  className="form-input"
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">ডেলিভারি ঠিকানা</label>
+              <div className="input-wrapper">
+                <MapPin className="input-icon top" size={18} />
+                <textarea 
+                  name="address"
+                  defaultValue={typeof user.address === 'object' && user.address 
+                    ? `${user.address.street || ''} ${user.address.city || ''} ${user.address.district || ''}`.trim() 
+                    : user.address}
+                  rows={3}
+                  className="form-input form-textarea"
+                />
+              </div>
+            </div>
+
+            <button 
+              type="submit"
+              className="save-btn"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Save size={20} className="animate-spin" />
+                  সেভ হচ্ছে...
+                </>
+              ) : (
+                <>
+                  <Save size={20} />
+                  পরিবর্তন সেভ করুন
+                </>
+              )}
+            </button>
+          </form>
+        </div>
       </div>
 
-      <div className="avatar-edit-section">
-        <div className="avatar-edit-wrapper">
-          <div className="avatar-edit-img">
-            <Image 
-              src={imagePreview || user.image || "/default-avatar.png"} 
-              alt={user.name || ''} 
-              fill 
-              className="object-cover"
-            />
-          </div>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleImageChange} 
-            accept="image/*" 
-            style={{ display: 'none' }} 
-          />
-          <button 
-            type="button"
-            className="camera-btn" 
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Camera size={14} />
-          </button>
+      <div className="auth-image-section">
+        <img src="/auth-profile-edit.png" alt="Inspiration" />
+        <div className="auth-image-overlay">
+          <p className="auth-quote">আপনার প্রোফাইল, আপনার পরিচয়।</p>
+          <p className="auth-author">সেরা মানের ফল, সরাসরি আপনার দুয়ারে।</p>
         </div>
-        <p className="avatar-edit-label">প্রোফাইল ছবি পরিবর্তন করুন</p>
       </div>
-
-      <form onSubmit={handleSave} className="edit-form">
-        <div className="form-group">
-          <label className="form-label">পুরো নাম</label>
-          <div className="input-wrapper">
-            <User className="input-icon" size={18} />
-            <input 
-              type="text" 
-              name="fullName"
-              defaultValue={user.name || user.fullName}
-              className="form-input"
-            />
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">ইমেইল ঠিকানা</label>
-          <div className="input-wrapper">
-            <Mail className="input-icon" size={18} />
-            <input 
-              type="email" 
-              name="email"
-              defaultValue={user.email}
-              className="form-input"
-            />
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">ফোন নম্বর</label>
-          <div className="input-wrapper">
-            <Phone className="input-icon" size={18} />
-            <input 
-              type="tel" 
-              name="phone"
-              defaultValue={user.phone}
-              className="form-input"
-            />
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">ডেলিভারি ঠিকানা</label>
-          <div className="input-wrapper">
-            <MapPin className="input-icon top" size={18} />
-            <textarea 
-              name="address"
-              defaultValue={typeof user.address === 'object' && user.address 
-                ? `${user.address.street || ''} ${user.address.city || ''} ${user.address.district || ''}`.trim() 
-                : user.address}
-              rows={3}
-              className="form-input form-textarea"
-            />
-          </div>
-        </div>
-
-        <button 
-          type="submit"
-          className="save-btn"
-        >
-          <Save size={20} />
-          {loading ? 'সেভ হচ্ছে...' : 'পরিবর্তন সেভ করুন'}
-        </button>
-      </form>
     </div>
   );
 }
