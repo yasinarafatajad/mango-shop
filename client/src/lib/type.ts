@@ -7,7 +7,7 @@ export interface Mango {
   image: string;
   descriptionBn: string;
   category: string;
-  isPopular?: boolean;
+  isActive?: boolean;
 }
 
 export interface Order {

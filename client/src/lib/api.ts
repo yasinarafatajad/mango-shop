@@ -11,8 +11,8 @@ const mapProductToMango = (product: any): Mango => ({
   unit: product.tags?.find((tag: string) => tag.startsWith('unit:'))?.replace('unit:', '') || 'কেজি',
   image: product.images?.[0]?.url || 'https://images.unsplash.com/photo-1553279768-865429fa0078?q=80&w=400&h=400&auto=format&fit=crop',
   descriptionBn: product.description || '',
-  category: product.category?.name || 'General',
-  isPopular: product.isActive || false,
+  category: product.category?.name || 'General',  
+  isActive: product.status === 'active',
 });
 
 export const fetchProducts = async (): Promise<Mango[]> => {
@@ -21,7 +21,10 @@ export const fetchProducts = async (): Promise<Mango[]> => {
     throw new Error('Failed to fetch products');
   }
   const data = await response.json();
-  return data.map(mapProductToMango);
+  // Filter for active products only on client side as well for robustness
+  return data
+    .filter((product: any) => product.status === 'active')
+    .map(mapProductToMango);
 };
 
 export const fetchProductById = async (id: string): Promise<Mango> => {
