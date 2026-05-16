@@ -153,3 +153,131 @@
   color: var(--primary-green);
   font-weight: 600;
 }
+
+.summary-title {
+  font-weight: 800;
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: var(--text-dark);
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.continue-shopping-link {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  color: #666;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.continue-shopping-link:hover {
+  color: var(--primary-green);
+  text-decoration: underline;
+}
+
+@media (min-width: 1024px) {
+  .cart-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  .cart-title {
+    font-size: 32px;
+    margin-bottom: 40px;
+  }
+
+  .cart-content-layout {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+  }
+
+  .cart-items {
+    flex: 1.8;
+    gap: 20px;
+  }
+
+  .cart-item {
+    padding: 20px;
+    gap: 20px;
+    transition: 0.2s;
+  }
+
+  .cart-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-color: var(--primary-green);
+  }
+
+  .cart-item-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  .cart-item-name {
+    font-size: 20px;
+  }
+
+  .cart-sidebar {
+    flex: 1;
+    position: sticky;
+    top: 100px;
+    background: #fcfcfc;
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    border: 1px solid #eee;
+  }
+
+  .cart-summary {
+    padding: 0;
+    background: transparent;
+  }
+
+  .summary-row {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  .summary-row.total {
+    margin-top: 20px;
+    font-size: 24px;
+  }
+
+  .checkout-btn {
+    margin-top: 30px;
+    padding: 20px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .checkout-btn:hover {
+    background: #e67e22;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(251, 140, 0, 0.4);
+  }
+
+  .remove-btn {
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: 0.2s;
+  }
+
+  .remove-btn:hover {
+    background: #fff1f1;
+    transform: scale(1.1);
+  }
+
+  .qty-btn:hover {
+    background: var(--primary-green);
+    color: white;
+  }
+}
+
+@media (min-width: 1400px) {
+    .cart-page {
+        max-width: 1200px;
+    }
+}

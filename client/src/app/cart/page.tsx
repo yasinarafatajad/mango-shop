@@ -53,7 +53,7 @@ export default function Cart() {
           </Link>
         </div>
       ) : (
-        <>
+        <div className="cart-content-layout">
           <div className="cart-items">
             {cartItems.map((item) => (
               <div key={item.id} className="cart-item">
@@ -92,17 +92,28 @@ export default function Cart() {
             ))}
           </div>
 
-          <div className="cart-summary">
-            <div className="summary-row total">
-              <span>সাবটোটাল</span>
-              <span className="total-amount">৳{total}</span>
+          <div className="cart-sidebar">
+            <div className="cart-summary">
+              <div className="summary-title">অর্ডার সামারি</div>
+              <div className="summary-row">
+                <span>আইটেম সংখ্যা</span>
+                <span>{cartItems.length} টি</span>
+              </div>
+              <div className="summary-row total">
+                <span>সাবটোটাল</span>
+                <span className="total-amount">৳{total}</span>
+              </div>
             </div>
-          </div>
 
-          <Link href="/checkout" className="checkout-btn">
-            চেকআউট করুন <ChevronRight size={20} />
-          </Link>
-        </>
+            <Link href="/checkout" className="checkout-btn">
+              চেকআউট করুন <ChevronRight size={20} />
+            </Link>
+
+            <Link href="/" className="continue-shopping-link">
+              কেনাকাটা চালিয়ে যান
+            </Link>
+          </div>
+        </div>
       )}
     </div>
   );

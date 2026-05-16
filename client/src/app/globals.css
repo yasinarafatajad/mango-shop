@@ -128,6 +128,10 @@ a {
 
 /* Hero / Banner */
 
+.banner-wrapper {
+  padding: 20px 40px;
+}
+
 .banner {
   width: 100%;
   height: 40vh;
@@ -162,6 +166,43 @@ a {
   font-size: 120px;
 }
 
+@media (min-width: 1024px) {
+  .banner-wrapper {
+    padding: 20px 40px;
+  }
+
+  .banner {
+    height: 50vh;
+    /* width: 100vw; */
+    padding: 80px;
+    border-radius: var(--radius-lg);
+    /* margin: 40px; */
+    background: linear-gradient(135deg, var(--primary-orange), #ff9800, #ffb300);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .banner h2 {
+    font-size: 64px;
+    max-width: 600px;
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  .banner p {
+    font-size: 20px;
+    max-width: 500px;
+  }
+
+  .banner-img {
+    font-size: 280px;
+    right: 40px;
+    bottom: -40px;
+    opacity: 0.2;
+  }
+}
+
 /* Products Grid */
 .section-title {
   padding: 16px;
@@ -187,7 +228,31 @@ a {
 
 @media (min-width: 768px) {
   .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 20px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .products-grid {
     grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    padding: 30px 20px;
+  }
+
+  .section-title {
+    padding: 30px 20px;
+  }
+
+  .section-title h3 {
+    font-size: 32px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .products-grid {
+    grid-template-columns: repeat(5, 1fr);
   }
 }
 
@@ -330,9 +395,10 @@ a {
 }
 
 /* Promo Section */
-.promo-section{
+.promo-section {
   padding-bottom: 40px;
 }
+
 .promo-box {
   background: #FFF7ED;
   padding: 70px;
@@ -352,6 +418,22 @@ a {
 .promo-text {
   color: #C2410C;
   font-size: 14px;
+}
+
+@media (min-width: 1024px) {
+  .promo-box {
+    padding: 100px;
+    margin: 60px 20px;
+  }
+
+  .promo-title {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  .promo-text {
+    font-size: 24px;
+  }
 }
 
 .flex {
