@@ -45,7 +45,7 @@ export default function Wishlist() {
           </Link>
         </div>
       ) : (
-        <div className="wishlist-grid">
+        <div className="products-grid">
           {wishlistItems.map((mango) => (
             <div key={mango.id} style={{ position: 'relative' }}>
               <ProductCard mango={mango} />

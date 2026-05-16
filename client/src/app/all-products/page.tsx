@@ -46,7 +46,7 @@ export default function AllProducts() {
         </Link>
         <h1 className="page-title">লোড হচ্ছে...</h1>
       </header>
-      <div className="loading-state">সব আম লোড করা হচ্ছে...</div>
+      <div className="loading-state">সব ফল লোড করা হচ্ছে...</div>
     </div>
   );
 
@@ -56,12 +56,12 @@ export default function AllProducts() {
         <Link href="/">
           <ArrowLeft size={24} />
         </Link>
-        <h1 className="page-title">সব আম ({products.length})</h1>
+        <h1 className="page-title">সব ফল ({products.length})</h1>
       </header>
 
       <div className="products-container">
         {products.length === 0 ? (
-          <div className="empty-state">কোনো আম পাওয়া যায়নি।</div>
+          <div className="empty-state">কোনো ফল পাওয়া যায়নি।</div>
         ) : (
           <>
             <div className="products-grid">

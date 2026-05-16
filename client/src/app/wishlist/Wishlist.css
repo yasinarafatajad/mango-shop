@@ -13,11 +13,11 @@
   color: var(--text-dark);
 }
 
-.wishlist-grid {
+/* .wishlist-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-}
+} */
 
 .empty-wishlist {
   text-align: center;

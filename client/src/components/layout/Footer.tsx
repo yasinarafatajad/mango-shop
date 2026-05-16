@@ -38,7 +38,7 @@ export default function Footer() {
           <h3>দ্রুত লিঙ্ক</h3>
           <ul>
             <li><Link href="/">হোম</Link></li>
-            <li><Link href="/all-products">সব আম</Link></li>
+            <li><Link href="/all-products">সব ফল</Link></li>
             <li><Link href="/cart">কার্ট</Link></li>
             <li><Link href="/my-orders">আমার অর্ডার</Link></li>
           </ul>
