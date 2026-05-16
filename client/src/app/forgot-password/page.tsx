@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Mail, Lock, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle, Eye, EyeOff, Search, User as UserIcon, MessageCircle } from 'lucide-react';
+import { Mail, Lock, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle, Eye, EyeOff, Search, User as UserIcon, MessageCircle, Loader2 } from 'lucide-react';
 import '../Auth.css';
 import { authSearchCustomer, authForgotPassword, authResetPassword, authVerifyOtp } from '@/lib/api';
 
@@ -22,6 +22,7 @@ export default function ForgotPasswordPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [timer, setTimer] = useState(0);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
@@ -41,6 +42,7 @@ export default function ForgotPasswordPage() {
             return;
         }
         
+        setLoading(true);
         try {
             const response = await authSearchCustomer(query.trim());
             if (response.success && response.customers.length > 0) {
@@ -51,6 +53,8 @@ export default function ForgotPasswordPage() {
             }
         } catch (err: any) {
             setError(err.message || 'সার্চ ব্যর্থ হয়েছে');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -67,6 +71,7 @@ export default function ForgotPasswordPage() {
             return;
         }
         
+        setLoading(true);
         try {
             const response = await authForgotPassword(selectedCustomer.id, selectedMethod);
             if (response.success) {
@@ -75,12 +80,15 @@ export default function ForgotPasswordPage() {
             }
         } catch (err: any) {
             setError(err.message || 'OTP পাঠাতে ব্যর্থ হয়েছে');
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleResend = async () => {
         if (timer > 0) return;
         setError('');
+        setLoading(true);
         try {
             const response = await authForgotPassword(selectedCustomer.id, selectedMethod!);
             if (response.success) {
@@ -89,6 +97,8 @@ export default function ForgotPasswordPage() {
             }
         } catch (err: any) {
             setError(err.message || 'OTP পুনরায় পাঠাতে ব্যর্থ হয়েছে');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -100,6 +110,7 @@ export default function ForgotPasswordPage() {
             return;
         }
         
+        setLoading(true);
         try {
             const response = await authVerifyOtp({
                 customerId: selectedCustomer.id,
@@ -110,6 +121,8 @@ export default function ForgotPasswordPage() {
             }
         } catch (err: any) {
             setError(err.message || 'OTP যাচাই ব্যর্থ হয়েছে');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -125,6 +138,7 @@ export default function ForgotPasswordPage() {
             return;
         }
         
+        setLoading(true);
         try {
             const response = await authResetPassword({ 
                 customerId: selectedCustomer.id, 
@@ -137,6 +151,8 @@ export default function ForgotPasswordPage() {
         } catch (err: any) {
             setError(err.message || 'পাসওয়ার্ড রিসেট ব্যর্থ হয়েছে');
             setStep('error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -192,8 +208,12 @@ export default function ForgotPasswordPage() {
                             />
                         </div>
                     </div>
-                    <button type="submit" className="auth-btn">
-                        খুঁজুন <ArrowRight size={20} />
+                    <button type="submit" className="auth-btn" disabled={loading}>
+                        {loading ? (
+                            <>খুঁজছি... <Loader2 size={20} className="animate-spin" /></>
+                        ) : (
+                            <>খুঁজুন <ArrowRight size={20} /></>
+                        )}
                     </button>
                 </form>
             )}
@@ -270,8 +290,12 @@ export default function ForgotPasswordPage() {
                             </label>
                         )}
                     </div>
-                    <button type="submit" className="auth-btn">
-                        OTP পাঠান <ArrowRight size={20} />
+                    <button type="submit" className="auth-btn" disabled={loading}>
+                        {loading ? (
+                            <>পাঠানো হচ্ছে... <Loader2 size={20} className="animate-spin" /></>
+                        ) : (
+                            <>OTP পাঠান <ArrowRight size={20} /></>
+                        )}
                     </button>
                     <button type="button" onClick={() => setStep('select-account')} className="text-btn" style={{ marginTop: '1rem', display: 'block', width: '100%', textAlign: 'center' }}>
                         ফিরে যান
@@ -310,8 +334,12 @@ export default function ForgotPasswordPage() {
                             ))}
                         </div>
                     </div>
-                    <button type="submit" className="auth-btn">
-                        ভেরিফাই করুন <ShieldCheck size={20} />
+                    <button type="submit" className="auth-btn" disabled={loading}>
+                        {loading ? (
+                            <>যাচাই করা হচ্ছে... <Loader2 size={20} className="animate-spin" /></>
+                        ) : (
+                            <>ভেরিফাই করুন <ShieldCheck size={20} /></>
+                        )}
                     </button>
 
                     <div className="otp-footer" style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem' }}>
@@ -379,8 +407,12 @@ export default function ForgotPasswordPage() {
                             />
                         </div>
                     </div>
-                    <button type="submit" className="auth-btn">
-                        পাসওয়ার্ড আপডেট করুন <CheckCircle2 size={20} />
+                    <button type="submit" className="auth-btn" disabled={loading}>
+                        {loading ? (
+                            <>আপডেট হচ্ছে... <Loader2 size={20} className="animate-spin" /></>
+                        ) : (
+                            <>পাসওয়ার্ড আপডেট করুন <CheckCircle2 size={20} /></>
+                        )}
                     </button>
                 </form>
             )}
