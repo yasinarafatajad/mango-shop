@@ -141,7 +141,7 @@ export default function Header() {
         {/* Desktop Navbar */}
         <nav className="desktop-navbar">
           <Link href="/" className="desktop-nav-link">হোম</Link>
-          <Link href="/all-products" className="desktop-nav-link">সব আম</Link>
+          <Link href="/all-products" className="desktop-nav-link">সব ফল</Link>
           <Link href="/my-orders" className="desktop-nav-link">আমার অর্ডার</Link>
           <Link href="/wishlist" className="desktop-nav-link">পছন্দের তালিকা</Link>
           <Link href={isLoggedIn ? "/profile" : "/login"} className="desktop-nav-link">

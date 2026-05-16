@@ -175,3 +175,111 @@
 .buy-now-btn-large:active, .add-cart-btn-large:active {
   transform: scale(0.97);
 }
+
+/* Desktop Responsive Styles */
+@media (min-width: 1024px) {
+  .product-details-page {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 40px 20px;
+    display: flex;
+    gap: 60px;
+    align-items: flex-start;
+  }
+
+  .details-header {
+    flex: 1;
+    max-height: 500px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    background: #fff;
+    aspect-ratio: 1 / 1.1;
+  }
+
+  .details-content {
+    flex: 1.2;
+    margin-top: 0;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .details-name {
+    font-size: 36px;
+    margin-bottom: 12px;
+  }
+
+  .details-category {
+    font-size: 14px;
+    padding: 6px 16px;
+    margin-bottom: 20px;
+  }
+
+  .details-price {
+    font-size: 32px;
+  }
+
+  .details-description {
+    font-size: 17px;
+    margin-bottom: 40px;
+    color: #444;
+  }
+
+  .quantity-selector {
+    margin-bottom: 40px;
+    padding: 24px;
+    background: #fcfcfc;
+    border: 1px solid #eee;
+    border-radius: var(--radius-md);
+    width: fit-content;
+  }
+
+  .action-buttons {
+    gap: 20px;
+    grid-template-columns: 240px 240px;
+  }
+
+  .add-cart-btn-large, .buy-now-btn-large {
+    padding: 16px;
+    font-size: 17px;
+    cursor: pointer;
+  }
+
+  .add-cart-btn-large:hover {
+    background: var(--primary-green);
+    color: white;
+  }
+
+  .buy-now-btn-large:hover {
+    background: #e67e22;
+    box-shadow: 0 6px 20px rgba(251, 140, 0, 0.4);
+  }
+
+  .back-btn-details {
+    top: 24px;
+    left: 24px;
+    width: 48px;
+    height: 48px;
+    transition: 0.2s;
+  }
+
+  .wish-btn {
+    top: 24px;
+    right: 24px;
+    width: 48px;
+    height: 48px;
+    transition: 0.2s;
+  }
+
+  .back-btn-details:hover, .wish-btn:hover {
+    transform: scale(1.1);
+    background: #fff;
+  }
+}
+
+@media (min-width: 1400px) {
+    .product-details-page {
+        max-width: 1200px;
+    }
+}
