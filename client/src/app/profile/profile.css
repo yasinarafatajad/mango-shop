@@ -465,3 +465,15 @@
     max-width: 1200px;
   }
 }
+
+.edit-profile-wrapper {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1023px) {
+  .edit-profile-wrapper {
+    padding: 0;
+  }
+}
