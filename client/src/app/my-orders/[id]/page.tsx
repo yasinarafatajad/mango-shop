@@ -87,123 +87,129 @@ export default function OrderDetails({ params }: { params: Promise<{ id: string 
         <h1 className="orders-title">অর্ডার বিস্তারিত</h1>
       </div>
 
-      {/* Order Status Tracker */}
-      <div className="order-detail-card">
-        <div className="card-title-row">
-          <Clock size={18} />
-          <span>অর্ডার ট্র্যাকিং ({order.status === 'cancelled' ? 'বাতিল করা হয়েছে' : 'অবস্থা'})</span>
-        </div>
-        <div className="status-tracker">
-          {steps.map((step, idx) => (
-            <div key={idx} className={`status-step ${getStepStatus(step.status) ? 'active' : ''}`}>
-              <div className="step-circle">
-                {step.icon}
-              </div>
-              <div className="step-info">
-                <div className="step-title">{step.label}</div>
-                <div className="step-date">{step.date}</div>
-              </div>
+      <div className="order-details-content">
+        <div className="order-details-left">
+          {/* Order Status Tracker */}
+          <div className="order-detail-card">
+            <div className="card-title-row">
+              <Clock size={18} />
+              <span>অর্ডার ট্র্যাকিং ({order.status === 'cancelled' ? 'বাতিল করা হয়েছে' : 'অবস্থা'})</span>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Delivery Info */}
-      <div className="order-detail-card">
-        <div className="card-title-row">
-          <MapPin size={18} />
-          <span>ডেলিভারি তথ্য</span>
-        </div>
-        <div style={{ fontSize: '14px', color: '#555', lineHeight: '1.6' }}>
-          <div style={{ fontWeight: '700', color: '#1A1A1A' }}>{order.shippingAddress?.fullName}</div>
-          <div>{order.shippingAddress?.phone}</div>
-          <div>{order.shippingAddress?.address}, {order.shippingAddress?.city}</div>
-        </div>
-      </div>
-
-      {/* Payment Info */}
-      <div className="order-detail-card">
-        <div className="card-title-row">
-          <CreditCard size={18} />
-          <span>পেমেন্ট তথ্য</span>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px' }}>
-          <div className="flex justify-between">
-            <span style={{ color: '#555' }}>পদ্ধতি:</span>
-            <span style={{ fontWeight: '700' }}>{order.paymentMethod}</span>
+            <div className="status-tracker">
+              {steps.map((step, idx) => (
+                <div key={idx} className={`status-step ${getStepStatus(step.status) ? 'active' : ''}`}>
+                  <div className="step-circle">
+                    {step.icon}
+                  </div>
+                  <div className="step-info">
+                    <div className="step-title">{step.label}</div>
+                    <div className="step-date">{step.date}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          {order.trxId && (
-            <div className="flex justify-between">
-              <span style={{ color: '#555' }}>TrxID:</span>
-              <span style={{ fontWeight: '700' }}>{order.trxId}</span>
-            </div>
-          )}
-          {order.senderNumber && (
-            <div className="flex justify-between">
-              <span style={{ color: '#555' }}>নম্বর:</span>
-              <span style={{ fontWeight: '700' }}>{order.senderNumber}</span>
-            </div>
-          )}
-          {order.paymentScreenshot && (
-            <div className="payment-screenshot-section">
-              <span style={{ color: '#555', fontSize: '14px', display: 'block', marginBottom: '8px' }}>পেমেন্ট স্ক্রিনশট:</span>
-              <div className="payment-screenshot-preview" onClick={() => setShowModal(true)}>
-                <img src={order.paymentScreenshot} alt="Payment Screenshot" />
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
 
-      {/* Ordered Items */}
-      <div className="order-detail-card">
-        <div className="card-title-row">
-          <Package size={18} />
-          <span>অর্ডারকৃত পণ্যসমূহ</span>
-        </div>
-        <div className="details-items-list">
-          {order.items?.map((item: any, idx: number) => (
-            <div key={idx} className="detail-item-row">
-              <img src={item.image} alt={item.name} className="detail-item-img" />
-              <div className="detail-item-info">
-                <div className="detail-item-name">{item.name}</div>
-                <div className="detail-item-price">৳{item.price} x {item.quantity || 1}</div>
-              </div>
-              <div style={{ fontWeight: '700' }}>৳{item.price * (item.quantity || 1)}</div>
+          {/* Delivery Info */}
+          <div className="order-detail-card">
+            <div className="card-title-row">
+              <MapPin size={18} />
+              <span>ডেলিভারি তথ্য</span>
             </div>
-          ))}
-        </div>
-      </div>
+            <div style={{ fontSize: '14px', color: '#555', lineHeight: '1.6' }}>
+              <div style={{ fontWeight: '700', color: '#1A1A1A' }}>{order.shippingAddress?.fullName}</div>
+              <div>{order.shippingAddress?.phone}</div>
+              <div>{order.shippingAddress?.address}, {order.shippingAddress?.city}</div>
+            </div>
+          </div>
 
-      {/* Bill Summary */}
-      <div className="order-detail-card">
-        <div className="details-summary-table">
-          <div className="summary-item">
-            <span>সাবটোটাল</span>
-            <span>৳{subtotal}</span>
-          </div>
-          <div className="summary-item">
-            <span>ডেলিভারি চার্জ</span>
-            <span>৳{shippingPrice}</span>
-          </div>
-          {discountPrice > 0 && (
-            <div className="summary-item" style={{ color: '#ff4d4d', fontWeight: '600' }}>
-              <span>ডিসকাউন্ট</span>
-              <span>-৳{discountPrice}</span>
+          {/* Payment Info */}
+          <div className="order-detail-card">
+            <div className="card-title-row">
+              <CreditCard size={18} />
+              <span>পেমেন্ট তথ্য</span>
             </div>
-          )}
-          <div className="summary-item total">
-            <span>সর্বমোট</span>
-            <span style={{ color: 'var(--primary-green)' }}>৳{order.totalPrice || order.total}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px' }}>
+              <div className="flex justify-between">
+                <span style={{ color: '#555' }}>পদ্ধতি:</span>
+                <span style={{ fontWeight: '700' }}>{order.paymentMethod}</span>
+              </div>
+              {order.trxId && (
+                <div className="flex justify-between">
+                  <span style={{ color: '#555' }}>TrxID:</span>
+                  <span style={{ fontWeight: '700' }}>{order.trxId}</span>
+                </div>
+              )}
+              {order.senderNumber && (
+                <div className="flex justify-between">
+                  <span style={{ color: '#555' }}>নম্বর:</span>
+                  <span style={{ fontWeight: '700' }}>{order.senderNumber}</span>
+                </div>
+              )}
+              {order.paymentScreenshot && (
+                <div className="payment-screenshot-section">
+                  <span style={{ color: '#555', fontSize: '14px', display: 'block', marginBottom: '8px' }}>পেমেন্ট স্ক্রিনশট:</span>
+                  <div className="payment-screenshot-preview" onClick={() => setShowModal(true)}>
+                    <img src={order.paymentScreenshot} alt="Payment Screenshot" />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Support Action */}
-      <Link href="https://wa.me/8801712972683" target="_blank" className="contact-support">
-        <MessageCircle size={20} />
-        সাপোর্টের জন্য যোগাযোগ করুন
-      </Link>
+        <div className="order-details-right">
+          {/* Ordered Items */}
+          <div className="order-detail-card">
+            <div className="card-title-row">
+              <Package size={18} />
+              <span>অর্ডারকৃত পণ্যসমূহ</span>
+            </div>
+            <div className="details-items-list">
+              {order.items?.map((item: any, idx: number) => (
+                <div key={idx} className="detail-item-row">
+                  <img src={item.image} alt={item.name} className="detail-item-img" />
+                  <div className="detail-item-info">
+                    <div className="detail-item-name">{item.name}</div>
+                    <div className="detail-item-price">৳{item.price} x {item.quantity || 1}</div>
+                  </div>
+                  <div style={{ fontWeight: '700' }}>৳{item.price * (item.quantity || 1)}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Bill Summary */}
+          <div className="order-detail-card">
+            <div className="details-summary-table">
+              <div className="summary-item">
+                <span>সাবটোটাল</span>
+                <span>৳{subtotal}</span>
+              </div>
+              <div className="summary-item">
+                <span>ডেলিভারি চার্জ</span>
+                <span>৳{shippingPrice}</span>
+              </div>
+              {discountPrice > 0 && (
+                <div className="summary-item" style={{ color: '#ff4d4d', fontWeight: '600' }}>
+                  <span>ডিসকাউন্ট</span>
+                  <span>-৳{discountPrice}</span>
+                </div>
+              )}
+              <div className="summary-item total">
+                <span>সর্বমোট</span>
+                <span style={{ color: 'var(--primary-green)' }}>৳{order.totalPrice || order.total}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Support Action */}
+          <Link href="https://wa.me/8801712972683" target="_blank" className="contact-support">
+            <MessageCircle size={20} />
+            সাপোর্টের জন্য যোগাযোগ করুন
+          </Link>
+        </div>
+      </div>
 
       {/* Image Modal */}
       {showModal && (

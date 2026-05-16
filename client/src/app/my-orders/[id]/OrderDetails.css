@@ -212,3 +212,69 @@
   from { transform: scale(0.9); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
+
+@media (min-width: 1024px) {
+  .order-details-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 60px 20px;
+  }
+
+  .details-header-row {
+    margin-bottom: 40px;
+  }
+
+  .details-header-row h1 {
+    font-size: 32px;
+  }
+
+  .order-details-content {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 40px;
+    align-items: flex-start;
+  }
+
+  .order-detail-card {
+    padding: 30px;
+    border-radius: 24px;
+    margin-bottom: 24px;
+  }
+
+  .card-title-row {
+    font-size: 20px;
+    margin-bottom: 24px;
+  }
+
+  .detail-item-img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .detail-item-name {
+    font-size: 18px;
+  }
+
+  .summary-item {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .summary-item.total {
+    font-size: 24px;
+  }
+
+  .status-tracker {
+    padding: 10px;
+  }
+
+  .step-title {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .order-details-page {
+    max-width: 1200px;
+  }
+}

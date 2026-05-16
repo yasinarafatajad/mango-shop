@@ -128,3 +128,42 @@
   margin-bottom: 16px;
   opacity: 0.2;
 }
+
+@media (min-width: 1024px) {
+  .orders-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  .orders-header {
+    margin-bottom: 40px;
+  }
+
+  .orders-title {
+    font-size: 32px;
+  }
+
+  .order-card {
+    padding: 24px;
+    transition: 0.2s;
+  }
+
+  .order-card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border-color: var(--primary-green);
+  }
+
+  .order-id {
+    font-size: 16px;
+  }
+
+  .order-thumb {
+    width: 70px;
+    height: 70px;
+  }
+
+  .order-total {
+    font-size: 20px;
+  }
+}

@@ -238,120 +238,32 @@ export default function Checkout() {
                 </div>
             )}
 
-            {/* Delivery Address */}
-            <div className="checkout-section">
-                <h3 className="section-title">
-                    <MapPin size={18} style={{ color: 'var(--primary-orange)' }} />
-                    ডেলিভারি ঠিকানা
-                </h3>
-
-                <div className="form-group">
-                    <label className="form-label">পুরো নাম</label>
-                    <div style={{ position: 'relative' }}>
-                        <User size={16} style={{ position: 'absolute', left: '12px', top: '14px', color: '#999' }} />
-                        <input 
-                            type="text" 
-                            className="form-input" 
-                            placeholder="আপনার নাম লিখুন" 
-                            style={{ paddingLeft: '38px' }} 
-                            value={fullName}
-                            onChange={(e) => setFullName(e.target.value)}
-                        />
-                    </div>
-                </div>
-
-                <div className="form-group">
-                    <label className="form-label">মোবাইল নম্বর</label>
-                    <div style={{ position: 'relative' }}>
-                        <Phone size={16} style={{ position: 'absolute', left: '12px', top: '14px', color: '#999' }} />
-                        <input 
-                            type="tel" 
-                            className="form-input" 
-                            placeholder="০১৭XXXXXXXX" 
-                            style={{ paddingLeft: '38px' }} 
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                        />
-                    </div>
-                </div>
-
-                <div className="form-group">
-                    <label className="form-label">বিস্তারিত ঠিকানা</label>
-                    <textarea
-                        className="form-input"
-                        placeholder="বাসা নম্বর, রোড নম্বর, এলাকা..."
-                        style={{ minHeight: '80px', resize: 'none' }}
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                    ></textarea>
-                </div>
-            </div>
-
-            {/* Payment Method */}
-            <div className="checkout-section">
-                <h3 className="section-title">
-                    <CreditCard size={18} />
-                    পেমেন্ট পদ্ধতি
-                </h3>
-
-                <div className="payment-grid">
-                    {paymentOptions.map((option) => (
-                        <button
-                            key={option.id}
-                            type="button"
-                            className={`payment-card ${paymentMethod === option.id ? 'active' : ''}`}
-                            onClick={() => setPaymentMethod(option.id)}
-                        >
-                            <div
-                                style={{
-                                    width: '60px',
-                                    height: '60px',
-                                    borderRadius: '8px',
-                                    background: option.color,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    color: 'white',
-                                    fontWeight: '900',
-                                    fontSize: '10px'
-                                }}
-                            >
-                                {option.id.toUpperCase()}
-                            </div>
-                            <span className="payment-name">{option.name}</span>
-                        </button>
-                    ))}
-                </div>
-
-                {paymentMethod !== 'cod' && (
-                    <div className="mobile-banking-form">
-                        <p style={{ fontSize: '13px', color: '#666', marginBottom: '16px', background: '#f8f8f8', padding: '10px', borderRadius: '8px', borderLeft: `4px solid ${paymentOptions.find(o => o.id === paymentMethod)?.color}` }}>
-                            আমাদের <b>{paymentNumber}</b> নম্বরে সেন্ড মানি করে নিচের তথ্যগুলো পূরণ করুন।
-                            <br />
-                            <button
-                                onClick={handleCopy}
-                                style={{
-                                    padding: '8px 20px',
-                                    background: isCopied ? '#37883aff' : 'var(--primary-green)',
-                                    color: 'white',
-                                    borderRadius: '4px',
-                                    fontWeight: '700',
-                                    border: 'none',
-                                    fontSize: '12px',
-                                    marginTop: '10px',
-                                    cursor: 'pointer',
-                                    boxShadow: '0 4px 15px rgba(27, 94, 32, 0.2)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px'
-                                }}
-                            >
-                                {isCopied ? 'কপি হয়েছে!' : 'কপি করুন'}
-                            </button>
-                        </p>
+            <div className="checkout-content-layout">
+                <div className="checkout-main">
+                    {/* Delivery Address */}
+                    <div className="checkout-section">
+                        <h3 className="section-title">
+                            <MapPin size={18} style={{ color: 'var(--primary-orange)' }} />
+                            ডেলিভারি ঠিকানা
+                        </h3>
 
                         <div className="form-group">
-                            <label className="form-label">যে নম্বর থেকে টাকা পাঠিয়েছেন</label>
+                            <label className="form-label">পুরো নাম</label>
+                            <div style={{ position: 'relative' }}>
+                                <User size={16} style={{ position: 'absolute', left: '12px', top: '14px', color: '#999' }} />
+                                <input 
+                                    type="text" 
+                                    className="form-input" 
+                                    placeholder="আপনার নাম লিখুন" 
+                                    style={{ paddingLeft: '38px' }} 
+                                    value={fullName}
+                                    onChange={(e) => setFullName(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">মোবাইল নম্বর</label>
                             <div style={{ position: 'relative' }}>
                                 <Phone size={16} style={{ position: 'absolute', left: '12px', top: '14px', color: '#999' }} />
                                 <input 
@@ -359,136 +271,217 @@ export default function Checkout() {
                                     className="form-input" 
                                     placeholder="০১৭XXXXXXXX" 
                                     style={{ paddingLeft: '38px' }} 
-                                    value={senderNumber}
-                                    onChange={(e) => setSenderNumber(e.target.value)}
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
                                 />
                             </div>
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label">ট্রানজেকশন আইডি (TrxID)</label>
-                            <div style={{ position: 'relative' }}>
-                                <Hash size={16} style={{ position: 'absolute', left: '12px', top: '14px', color: '#999' }} />
-                                <input 
-                                    type="text" 
-                                    className="form-input" 
-                                    placeholder="8N7A6S5D4" 
-                                    style={{ paddingLeft: '38px' }} 
-                                    value={trxId}
-                                    onChange={(e) => setTrxId(e.target.value)}
-                                />
-                            </div>
+                            <label className="form-label">বিস্তারিত ঠিকানা</label>
+                            <textarea
+                                className="form-input"
+                                placeholder="বাসা নম্বর, রোড নম্বর, এলাকা..."
+                                style={{ minHeight: '80px', resize: 'none' }}
+                                value={address}
+                                onChange={(e) => setAddress(e.target.value)}
+                            ></textarea>
                         </div>
+                    </div>
 
-                        <div className="upload-box">
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => setScreenshot(e.target.files?.[0] || null)}
-                            />
-                            {screenshot ? (
-                                <div className="file-preview">
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <span>{screenshot.name}</span>
+                    {/* Payment Method */}
+                    <div className="checkout-section">
+                        <h3 className="section-title">
+                            <CreditCard size={18} />
+                            পেমেন্ট পদ্ধতি
+                        </h3>
+
+                        <div className="payment-grid">
+                            {paymentOptions.map((option) => (
+                                <button
+                                    key={option.id}
+                                    type="button"
+                                    className={`payment-card ${paymentMethod === option.id ? 'active' : ''}`}
+                                    onClick={() => setPaymentMethod(option.id)}
+                                >
+                                    <div
+                                        style={{
+                                            width: '60px',
+                                            height: '60px',
+                                            borderRadius: '8px',
+                                            background: option.color,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: 'white',
+                                            fontWeight: '900',
+                                            fontSize: '10px'
+                                        }}
+                                    >
+                                        {option.id.toUpperCase()}
                                     </div>
-                                    <img
-                                        src={URL.createObjectURL(screenshot)}
-                                        alt="Preview"
-                                        className="screenshot-preview"
-                                    />
+                                    <span className="payment-name">{option.name}</span>
+                                </button>
+                            ))}
+                        </div>
+
+                        {paymentMethod !== 'cod' && (
+                            <div className="mobile-banking-form">
+                                <p style={{ fontSize: '13px', color: '#666', marginBottom: '16px', background: '#f8f8f8', padding: '10px', borderRadius: '8px', borderLeft: `4px solid ${paymentOptions.find(o => o.id === paymentMethod)?.color}` }}>
+                                    আমাদের <b>{paymentNumber}</b> নম্বরে সেন্ড মানি করে নিচের তথ্যগুলো পূরণ করুন।
+                                    <br />
+                                    <button
+                                        onClick={handleCopy}
+                                        className="copy-btn"
+                                    >
+                                        {isCopied ? 'কপি হয়েছে!' : 'কপি করুন'}
+                                    </button>
+                                </p>
+
+                                <div className="form-group">
+                                    <label className="form-label">যে নম্বর থেকে টাকা পাঠিয়েছেন</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <Phone size={16} style={{ position: 'absolute', left: '12px', top: '14px', color: '#999' }} />
+                                        <input 
+                                            type="tel" 
+                                            className="form-input" 
+                                            placeholder="০১৭XXXXXXXX" 
+                                            style={{ paddingLeft: '38px' }} 
+                                            value={senderNumber}
+                                            onChange={(e) => setSenderNumber(e.target.value)}
+                                        />
+                                    </div>
                                 </div>
-                            ) : (
-                                <>
-                                    <Camera size={24} className="upload-icon" />
-                                    <p>পেমেন্ট স্ক্রিনশট আপলোড করুন (ঐচ্ছিক)</p>
-                                </>
-                            )}
+
+                                <div className="form-group">
+                                    <label className="form-label">ট্রানজেকশন আইডি (TrxID)</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <Hash size={16} style={{ position: 'absolute', left: '12px', top: '14px', color: '#999' }} />
+                                        <input 
+                                            type="text" 
+                                            className="form-input" 
+                                            placeholder="8N7A6S5D4" 
+                                            style={{ paddingLeft: '38px' }} 
+                                            value={trxId}
+                                            onChange={(e) => setTrxId(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="upload-box">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => setScreenshot(e.target.files?.[0] || null)}
+                                    />
+                                    {screenshot ? (
+                                        <div className="file-preview">
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <span>{screenshot.name}</span>
+                                            </div>
+                                            <img
+                                                src={URL.createObjectURL(screenshot)}
+                                                alt="Preview"
+                                                className="screenshot-preview"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <Camera size={24} className="upload-icon" />
+                                            <p>পেমেন্ট স্ক্রিনশট আপলোড করুন (ঐচ্ছিক)</p>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="checkout-sidebar">
+                    {/* Delivery Charge Dropdown */}
+                    <div className="checkout-section">
+                        <h3 className="section-title">
+                            <Truck size={18} />
+                            ডেলিভারি চার্জ
+                        </h3>
+                        <div className="form-group">
+                            <select 
+                                className="form-input" 
+                                value={selectedChargeId}
+                                onChange={handleDeliveryChargeChange}
+                                style={{ appearance: 'auto', paddingRight: '30px' }}
+                            >
+                                {deliveryCharges.map((charge) => (
+                                    <option key={charge._id} value={charge._id}>
+                                        {charge.name} - ৳{charge.charge}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
-                )}
-            </div>
 
-            {/* Delivery Charge Dropdown */}
-            <div className="checkout-section">
-                <h3 className="section-title">
-                    <Truck size={18} />
-                    ডেলিভারি চার্জ নির্বাচন করুন
-                </h3>
-                <div className="form-group">
-                    <select 
-                        className="form-input" 
-                        value={selectedChargeId}
-                        onChange={handleDeliveryChargeChange}
-                        style={{ appearance: 'auto', paddingRight: '30px' }}
-                    >
-                        {deliveryCharges.map((charge) => (
-                            <option key={charge._id} value={charge._id}>
-                                {charge.name} - ৳{charge.charge}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            </div>
-
-            {/* Coupon Section */}
-            <div className="checkout-section">
-                <h3 className="section-title">
-                    <Ticket size={18} />
-                    প্রোমো কোড
-                </h3>
-                <div className="coupon-wrapper">
-                    <input 
-                        type="text" 
-                        placeholder="কুপন কোড দিন" 
-                        className="coupon-input"
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value)}
-                    />
-                    <button 
-                        className="coupon-apply-btn" 
-                        onClick={applyCoupon}
-                        disabled={loading || !couponCode}
-                    >
-                        {loading ? 'প্রয়োগ হচ্ছে...' : 'প্রয়োগ করুন'}
-                    </button>
-                </div>
-                {couponStatus && (
-                    <span className={`coupon-status ${couponStatus.type}`}>
-                        {couponStatus.message}
-                    </span>
-                )}
-            </div>
-
-            {/* Order Summary */}
-            <div className="checkout-section">
-                <h3 className="section-title">অর্ডার সামারি</h3>
-                <div className="order-summary-mini">
-                    <span>সাবটোটাল</span>
-                    <span>৳{subtotal}</span>
-                </div>
-                <div className="order-summary-mini">
-                    <span>ডেলিভারি চার্জ</span>
-                    <span>৳{deliveryChargeAmount}</span>
-                </div>
-                {discount > 0 && (
-                    <div className="order-summary-mini discount-row">
-                        <span>ডিসকাউন্ট</span>
-                        <span>-৳{discount}</span>
+                    {/* Coupon Section */}
+                    <div className="checkout-section">
+                        <h3 className="section-title">
+                            <Ticket size={18} />
+                            প্রোমো কোড
+                        </h3>
+                        <div className="coupon-wrapper">
+                            <input 
+                                type="text" 
+                                placeholder="কুপন কোড দিন" 
+                                className="coupon-input"
+                                value={couponCode}
+                                onChange={(e) => setCouponCode(e.target.value)}
+                            />
+                            <button 
+                                className="coupon-apply-btn" 
+                                onClick={applyCoupon}
+                                disabled={loading || !couponCode}
+                            >
+                                {loading ? 'প্রয়োগ হচ্ছে...' : 'প্রয়োগ করুন'}
+                            </button>
+                        </div>
+                        {couponStatus && (
+                            <span className={`coupon-status ${couponStatus.type}`}>
+                                {couponStatus.message}
+                            </span>
+                        )}
                     </div>
-                )}
-                <div className="order-total-mini">
-                    <span>সর্বমোট</span>
-                    <span style={{ color: 'var(--primary-green)' }}>৳{total}</span>
+
+                    {/* Order Summary */}
+                    <div className="checkout-section summary-sticky">
+                        <h3 className="section-title">অর্ডার সামারি</h3>
+                        <div className="order-summary-mini">
+                            <span>সাবটোটাল</span>
+                            <span>৳{subtotal}</span>
+                        </div>
+                        <div className="order-summary-mini">
+                            <span>ডেলিভারি চার্জ</span>
+                            <span>৳{deliveryChargeAmount}</span>
+                        </div>
+                        {discount > 0 && (
+                            <div className="order-summary-mini discount-row">
+                                <span>ডিসকাউন্ট</span>
+                                <span>-৳{discount}</span>
+                            </div>
+                        )}
+                        <div className="order-total-mini">
+                            <span>সর্বমোট</span>
+                            <span style={{ color: 'var(--primary-green)', fontSize: '20px' }}>৳{total}</span>
+                        </div>
+
+                        <button 
+                            className={`place-order-btn ${loading || cartItems.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`} 
+                            onClick={handlePlaceOrder}
+                            disabled={loading || cartItems.length === 0}
+                            style={{ marginTop: '20px' }}
+                        >
+                            {loading ? 'অর্ডার হচ্ছে...' : 'অর্ডার কনফার্ম করুন'}
+                        </button>
+                    </div>
                 </div>
             </div>
-
-            <button 
-                className={`place-order-btn ${loading || cartItems.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`} 
-                onClick={handlePlaceOrder}
-                disabled={loading || cartItems.length === 0}
-            >
-                {loading ? 'অর্ডার হচ্ছে...' : 'অর্ডার কনফার্ম করুন'}
-            </button>
         </div>
     );
 }
