@@ -11,7 +11,8 @@
   max-height: 280px;
 }
 
-.details-image {
+.details-image,
+.details-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
