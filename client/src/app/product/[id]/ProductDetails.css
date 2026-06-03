@@ -1,11 +1,12 @@
 .product-details-page {
   animation: animate-in 0.3s ease-out;
   padding-bottom: 40px;
+  width: 100vw;
 }
 
 .details-header {
   position: relative;
-  width: 100%;
+  width: 100vw !important;
   aspect-ratio: 1;
   background: #f5f5f5;
   max-height: 280px;
