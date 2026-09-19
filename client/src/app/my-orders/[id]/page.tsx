@@ -10,17 +10,47 @@ import {
   Clock, 
   Truck,
   MessageCircle,
-  Hash,
-  Phone,
   X
 } from 'lucide-react';
 import Link from 'next/link';
 import { fetchOrderById } from '@/lib/api';
 import './OrderDetails.css';
 
+interface OrderItem {
+  product?: string;
+  name: string;
+  image?: string;
+  price: number;
+  quantity: number;
+}
+
+interface OrderDetailsType {
+  id?: string;
+  _id?: string;
+  date?: string;
+  status?: string;
+  orderStatus?: string;
+  itemsPrice?: number;
+  shippingPrice?: number;
+  discountPrice?: number;
+  totalPrice?: number;
+  total?: number;
+  paymentMethod?: string;
+  trxId?: string;
+  senderNumber?: string;
+  paymentScreenshot?: string;
+  shippingAddress?: {
+    fullName?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+  };
+  items?: OrderItem[];
+}
+
 export default function OrderDetails({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const [order, setOrder] = useState<any | null>(null);
+  const [order, setOrder] = useState<OrderDetailsType | null>(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
@@ -61,11 +91,12 @@ export default function OrderDetails({ params }: { params: Promise<{ id: string 
 
   // Tracking status logic
   const statusOrder = ['pending', 'confirmed', 'shipped', 'delivered'];
+  const currentStatus = order.status || 'pending';
   const steps = [
     { label: 'অর্ডার প্লেস করা হয়েছে', date: order.date, status: 'pending', icon: <Clock size={14} /> },
-    { label: 'প্রক্রিয়াজাতকরণ চলছে', date: order.status === 'confirmed' || statusOrder.indexOf(order.status) > 1 ? 'প্রক্রিয়া সম্পন্ন' : 'অপেক্ষমান', status: 'confirmed', icon: <Package size={14} /> },
-    { label: 'ডেলিভারির জন্য পাঠানো হয়েছে', date: order.status === 'shipped' || order.status === 'delivered' ? 'পাঠানো হয়েছে' : '-', status: 'shipped', icon: <Truck size={14} /> },
-    { label: 'ডেলিভারি সম্পন্ন', date: order.status === 'delivered' ? 'সম্পন্ন' : '-', status: 'delivered', icon: <CheckCircle2 size={14} /> },
+    { label: 'প্রক্রিয়াজাতকরণ চলছে', date: currentStatus === 'confirmed' || statusOrder.indexOf(currentStatus) > 1 ? 'প্রক্রিয়া সম্পন্ন' : 'অপেক্ষমান', status: 'confirmed', icon: <Package size={14} /> },
+    { label: 'ডেলিভারির জন্য পাঠানো হয়েছে', date: currentStatus === 'shipped' || currentStatus === 'delivered' ? 'পাঠানো হয়েছে' : '-', status: 'shipped', icon: <Truck size={14} /> },
+    { label: 'ডেলিভারি সম্পন্ন', date: currentStatus === 'delivered' ? 'সম্পন্ন' : '-', status: 'delivered', icon: <CheckCircle2 size={14} /> },
   ];
 
   const getStepStatus = (stepStatus: string) => {
@@ -74,7 +105,7 @@ export default function OrderDetails({ params }: { params: Promise<{ id: string 
     return stepIdx <= currentIdx && order.status !== 'cancelled';
   };
 
-  const subtotal = order.itemsPrice || order.items?.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0) || 0;
+  const subtotal = order.itemsPrice || order.items?.reduce((acc: number, item: OrderItem) => acc + (item.price * item.quantity), 0) || 0;
   const shippingPrice = order.shippingPrice || 0;
   const discountPrice = order.discountPrice || 0;
 
@@ -150,6 +181,7 @@ export default function OrderDetails({ params }: { params: Promise<{ id: string 
                 <div className="payment-screenshot-section">
                   <span style={{ color: '#555', fontSize: '14px', display: 'block', marginBottom: '8px' }}>পেমেন্ট স্ক্রিনশট:</span>
                   <div className="payment-screenshot-preview" onClick={() => setShowModal(true)}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={order.paymentScreenshot} alt="Payment Screenshot" />
                   </div>
                 </div>
@@ -166,8 +198,9 @@ export default function OrderDetails({ params }: { params: Promise<{ id: string 
               <span>অর্ডারকৃত পণ্যসমূহ</span>
             </div>
             <div className="details-items-list">
-              {order.items?.map((item: any, idx: number) => (
+              {order.items?.map((item: OrderItem, idx: number) => (
                 <div key={idx} className="detail-item-row">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={item.image} alt={item.name} className="detail-item-img" />
                   <div className="detail-item-info">
                     <div className="detail-item-name">{item.name}</div>
@@ -217,6 +250,7 @@ export default function OrderDetails({ params }: { params: Promise<{ id: string 
           <button className="absolute top-6 right-6 text-white hover:scale-110 transition-transform">
             <X size={32} />
           </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={order.paymentScreenshot} alt="Enlarged Payment Screenshot" className="modal-content" onClick={(e) => e.stopPropagation()} />
         </div>
       )}

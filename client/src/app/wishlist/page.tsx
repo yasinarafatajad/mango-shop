@@ -9,18 +9,15 @@ import { getWishlist, toggleWishlist } from '@/lib/storage';
 import './Wishlist.css';
 
 export default function Wishlist() {
-  const [wishlistItems, setWishlistItems] = useState<Mango[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const refreshWishlist = () => {
-    setWishlistItems(getWishlist());
-    setLoading(false);
-  };
+  const [wishlistItems, setWishlistItems] = useState<Mango[]>(() => typeof window !== 'undefined' ? getWishlist() : []);
+  const [loading] = useState(false);
 
   useEffect(() => {
-    refreshWishlist();
-    window.addEventListener('wishlist-updated', refreshWishlist);
-    return () => window.removeEventListener('wishlist-updated', refreshWishlist);
+    const handleWishlistUpdate = () => {
+      setWishlistItems(getWishlist());
+    };
+    window.addEventListener('wishlist-updated', handleWishlistUpdate);
+    return () => window.removeEventListener('wishlist-updated', handleWishlistUpdate);
   }, []);
 
   const removeFromWishlist = (mango: Mango) => {

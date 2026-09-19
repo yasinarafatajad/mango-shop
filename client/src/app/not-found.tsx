@@ -19,6 +19,11 @@ export default function NotFound() {
         দুঃখিত, আপনি যে পেজটি খুঁজছেন তা বর্তমানে আমাদের সার্ভারে নেই অথবা লিঙ্কটি ভুল। 
         দয়া করে আবার চেষ্টা করুন অথবা হোম পেজে ফিরে যান।
       </p>
+
+      <Link href="/" className="flex items-center gap-2 px-6 py-3 bg-primary-green text-white font-semibold rounded-full hover:bg-opacity-90 transition-all">
+        <Home size={18} />
+        হোম পেজে ফিরে যান
+      </Link>
     </div>
   );
 }

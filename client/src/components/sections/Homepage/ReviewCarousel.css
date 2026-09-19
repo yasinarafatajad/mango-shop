@@ -1,0 +1,177 @@
+.review-carousel-section {
+  position: relative;
+  width: 100%;
+  padding: 60px 16px;
+  overflow: hidden;
+  margin: 32px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 440px;
+}
+
+/* Parallax style background */
+.review-parallax-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?q=80&w=1600&auto=format&fit=crop');
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: brightness(0.65) saturate(1.2);
+  z-index: 0;
+}
+
+.review-parallax-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(27, 94, 32, 0.85) 0%,
+    rgba(251, 140, 0, 0.75) 50%,
+    rgba(27, 94, 32, 0.9) 100%
+  );
+  backdrop-filter: blur(4px);
+  z-index: 1;
+}
+
+/* Carousel container */
+.review-carousel-container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.review-slider-track-wrapper {
+  overflow: hidden;
+  border-radius: var(--radius-lg, 24px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.review-slider-track {
+  display: flex;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  width: 100%;
+}
+
+.review-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.review-image-card {
+  width: 100%;
+  height: 380px;
+  border-radius: var(--radius-md, 16px);
+  overflow: hidden;
+  position: relative;
+  background: #000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.review-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.review-image-card:hover .review-img {
+  transform: scale(1.03);
+}
+
+/* Nav buttons */
+.review-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--primary-orange, #FB8C00);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  transition: all 0.3s ease;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.review-nav-btn:hover {
+  background: var(--primary-green, #1B5E20);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+
+.review-nav-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.review-prev-btn {
+  left: -20px;
+}
+
+.review-next-btn {
+  right: -20px;
+}
+
+/* Indicator dots */
+.review-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.review-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.review-dot.active {
+  width: 32px;
+  border-radius: 12px;
+  background: var(--accent-yellow, #FFD600);
+  box-shadow: 0 0 10px rgba(255, 214, 0, 0.7);
+}
+
+/* Mobile responsive fixes */
+@media (max-width: 768px) {
+  .review-carousel-section {
+    padding: 40px 12px;
+    min-height: 340px;
+  }
+
+  .review-image-card {
+    height: 260px;
+  }
+
+  .review-prev-btn {
+    left: -10px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .review-next-btn {
+    right: -10px;
+    width: 40px;
+    height: 40px;
+  }
+}

@@ -117,3 +117,5 @@ Mango-Shop/
 _Full-Stack Developer_
 
 ---
+
+add image gallery section under promotional setion. hard coded. parallal style background. match with existing color theme. in client homepage.

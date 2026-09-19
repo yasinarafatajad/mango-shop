@@ -8,12 +8,22 @@ import { authSearchCustomer, authForgotPassword, authResetPassword, authVerifyOt
 
 type Step = 'search' | 'select-account' | 'select-method' | 'otp' | 'new-password' | 'success' | 'error';
 
+interface CustomerSearchItem {
+    id: string;
+    fullName: string;
+    email?: string;
+    phone?: string;
+    image?: string;
+    hasEmail?: boolean;
+    hasPhone?: boolean;
+}
+
 export default function ForgotPasswordPage() {
     const [step, setStep] = useState<Step>('search');
     
     const [query, setQuery] = useState('');
-    const [customers, setCustomers] = useState<any[]>([]);
-    const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+    const [customers, setCustomers] = useState<CustomerSearchItem[]>([]);
+    const [selectedCustomer, setSelectedCustomer] = useState<CustomerSearchItem | null>(null);
     const [selectedMethod, setSelectedMethod] = useState<'email' | 'whatsapp' | null>(null);
     
     const [otp, setOtp] = useState(['', '', '', '']);
@@ -45,20 +55,21 @@ export default function ForgotPasswordPage() {
         setLoading(true);
         try {
             const response = await authSearchCustomer(query.trim());
-            if (response.success && response.customers.length > 0) {
+            if (response.success && response.customers && response.customers.length > 0) {
                 setCustomers(response.customers);
                 setStep('select-account');
             } else {
                 setError('কোনো অ্যাকাউন্ট পাওয়া যায়নি');
             }
-        } catch (err: any) {
-            setError(err.message || 'সার্চ ব্যর্থ হয়েছে');
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : 'সার্চ ব্যর্থ হয়েছে';
+            setError(msg);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleSelectAccount = (customer: any) => {
+    const handleSelectAccount = (customer: CustomerSearchItem) => {
         setSelectedCustomer(customer);
         setStep('select-method');
     };
@@ -66,7 +77,7 @@ export default function ForgotPasswordPage() {
     const handleMethodSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-        if (!selectedMethod) {
+        if (!selectedMethod || !selectedCustomer) {
             setError('একটি মাধ্যম নির্বাচন করুন');
             return;
         }
@@ -78,25 +89,27 @@ export default function ForgotPasswordPage() {
                 setStep('otp');
                 setTimer(30);
             }
-        } catch (err: any) {
-            setError(err.message || 'OTP পাঠাতে ব্যর্থ হয়েছে');
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : 'OTP পাঠাতে ব্যর্থ হয়েছে';
+            setError(msg);
         } finally {
             setLoading(false);
         }
     };
 
     const handleResend = async () => {
-        if (timer > 0) return;
+        if (timer > 0 || !selectedCustomer || !selectedMethod) return;
         setError('');
         setLoading(true);
         try {
-            const response = await authForgotPassword(selectedCustomer.id, selectedMethod!);
+            const response = await authForgotPassword(selectedCustomer.id, selectedMethod);
             if (response.success) {
                 setTimer(30);
                 setOtp(['', '', '', '']);
             }
-        } catch (err: any) {
-            setError(err.message || 'OTP পুনরায় পাঠাতে ব্যর্থ হয়েছে');
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : 'OTP পুনরায় পাঠাতে ব্যর্থ হয়েছে';
+            setError(msg);
         } finally {
             setLoading(false);
         }
@@ -105,6 +118,7 @@ export default function ForgotPasswordPage() {
     const handleOtpSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        if (!selectedCustomer) return;
         if (otp.join('').length < 4) {
             setError('সঠিক OTP দিন');
             return;
@@ -119,8 +133,9 @@ export default function ForgotPasswordPage() {
             if (response.success) {
                 setStep('new-password');
             }
-        } catch (err: any) {
-            setError(err.message || 'OTP যাচাই ব্যর্থ হয়েছে');
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : 'OTP যাচাই ব্যর্থ হয়েছে';
+            setError(msg);
         } finally {
             setLoading(false);
         }
@@ -129,6 +144,7 @@ export default function ForgotPasswordPage() {
     const handlePasswordSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        if (!selectedCustomer) return;
         if (newPassword.length < 6) {
             setError('পাসওয়ার্ড অন্তত ৬ অক্ষরের হতে হবে');
             return;
@@ -148,8 +164,9 @@ export default function ForgotPasswordPage() {
             if (response.success) {
                 setStep('success');
             }
-        } catch (err: any) {
-            setError(err.message || 'পাসওয়ার্ড রিসেট ব্যর্থ হয়েছে');
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : 'পাসওয়ার্ড রিসেট ব্যর্থ হয়েছে';
+            setError(msg);
             setStep('error');
         } finally {
             setLoading(false);
@@ -159,9 +176,10 @@ export default function ForgotPasswordPage() {
     return (
         <div className="auth-container">
             <div className="auth-image-section">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/auth-register.png" alt="Inspiration" />
                 <div className="auth-image-overlay">
-                    <h2 className="auth-quote">"আমরা আপনার পাসওয়ার্ড পুনরুদ্ধারে সহায়তা করতে এখানে আছি।"</h2>
+                    <h2 className="auth-quote">&quot;আমরা আপনার পাসওয়ার্ড পুনরুদ্ধারে সহায়তা করতে এখানে আছি।&quot;</h2>
                     <p className="auth-author">— ম্যাঙ্গো শপ সাপোর্ট</p>
                 </div>
             </div>
@@ -245,6 +263,7 @@ export default function ForgotPasswordPage() {
                                 >
                                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', marginRight: '1rem', backgroundColor: '#f3f4f6', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                         {customer.image ? (
+                                            /* eslint-disable-next-line @next/next/no-img-element */
                                             <img src={customer.image} alt={customer.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         ) : (
                                             <UserIcon size={20} color="#9ca3af" />
@@ -266,7 +285,7 @@ export default function ForgotPasswordPage() {
                         </div>
                     )}
 
-                    {step === 'select-method' && (
+                    {step === 'select-method' && selectedCustomer && (
                         <form className="auth-form" onSubmit={handleMethodSubmit}>
                             {error && <div className="error-message">{error}</div>}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>

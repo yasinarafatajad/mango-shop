@@ -2,8 +2,61 @@ import { Mango, Order, UserType } from "./type";
 
 const API_URL = (process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '') || 'http://localhost:3001') + "/api/v1";
 
+interface ServerProduct {
+  _id: string;
+  title: string;
+  description?: string;
+  price: number;
+  status: string;
+  tags?: string[];
+  images?: { url?: string }[];
+  category?: { name?: string };
+}
+
+interface ServerOrderItem {
+  product: string;
+  name: string;
+  price: number;
+  image?: string;
+  quantity: number;
+}
+
+interface ServerOrder {
+  _id: string;
+  createdAt: string;
+  totalPrice: number;
+  orderStatus: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+  items: ServerOrderItem[];
+  [key: string]: unknown;
+}
+
+interface ServerCustomer {
+  _id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  role: 'admin' | 'customer';
+  address?: {
+    street?: string;
+    city?: string;
+  };
+  createdAt: string;
+}
+
+interface ApiResponse<T = unknown> {
+  success?: boolean;
+  message?: string;
+  url?: string;
+  secure_url?: string;
+  token?: string;
+  user?: UserType;
+  customer?: UserType;
+  customers?: T;
+  discount?: number;
+}
+
 // Mapper to convert server product to client Mango type
-const mapProductToMango = (product: any): Mango => ({
+const mapProductToMango = (product: ServerProduct): Mango => ({
   id: product._id,
   name: product.title,
   nameBn: product.tags?.find((tag: string) => tag.startsWith('bn:'))?.replace('bn:', '') || product.title,
@@ -13,6 +66,13 @@ const mapProductToMango = (product: any): Mango => ({
   descriptionBn: product.description || '',
   category: product.category?.name || 'General',  
   isActive: product.status === 'active',
+  sku: '',
+  stock: 0,
+  color: [],
+  size: [],
+  status: product.status === 'active' ? 'active' : 'draft',
+  createdAt: new Date(),
+  updatedAt: new Date()
 });
 
 export const fetchProducts = async (): Promise<Mango[]> => {
@@ -20,10 +80,9 @@ export const fetchProducts = async (): Promise<Mango[]> => {
   if (!response.ok) {
     throw new Error('Failed to fetch products');
   }
-  const data = await response.json();
-  // Filter for active products only on client side as well for robustness
+  const data: ServerProduct[] = await response.json();
   return data
-    .filter((product: any) => product.status === 'active')
+    .filter((product: ServerProduct) => product.status === 'active')
     .map(mapProductToMango);
 };
 
@@ -32,7 +91,7 @@ export const fetchProductById = async (id: string): Promise<Mango> => {
   if (!response.ok) {
     throw new Error('Failed to fetch product');
   }
-  const data = await response.json();
+  const data: ServerProduct = await response.json();
   return mapProductToMango(data);
 };
 
@@ -47,36 +106,44 @@ export const fetchOrders = async (email?: string, phone?: string): Promise<Order
   if (!response.ok) {
     return [];
   }
-  const data = await response.json();
-  // Server returns a list of orders directly for getAllOrder
-  return data.map((order: any) => ({
+  const data: ServerOrder[] = await response.json();
+  return data.map((order: ServerOrder) => ({
     id: order._id,
     date: new Date(order.createdAt).toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' }),
     total: order.totalPrice,
     status: order.orderStatus,
-    items: order.items.map((item: any) => ({
+    items: order.items.map((item: ServerOrderItem) => ({
       id: item.product,
-      name: item.name,
+      _id: item.product,
+      title: item.name,
+      sku: '',
+      category: '',
+      images: [{ url: item.image || '' }],
+      color: [],
+      size: [],
       price: item.price,
-      image: item.image,
-      quantity: item.quantity
+      stock: item.quantity,
+      status: 'active' as const,
+      createdAt: new Date(),
+      updatedAt: new Date()
     }))
   }));
 };
 
-export const fetchOrderById = async (id: string): Promise<any> => {
+export const fetchOrderById = async (id: string): Promise<ServerOrder> => {
   const response = await fetch(`${API_URL}/getOrder/${id}`);
   if (!response.ok) {
     throw new Error('Failed to fetch order');
   }
-  const order = await response.json();
+  const order: ServerOrder = await response.json();
   return {
     ...order,
     id: order._id,
     date: new Date(order.createdAt).toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' }),
     total: order.totalPrice,
     status: order.orderStatus,
-    items: order.items.map((item: any) => ({
+    items: order.items.map((item: ServerOrderItem) => ({
+      ...item,
       id: item.product,
       name: item.name,
       price: item.price,
@@ -91,13 +158,13 @@ export const fetchCustomerById = async (id: string): Promise<UserType> => {
   if (!response.ok) {
     throw new Error('Failed to fetch customer');
   }
-  const customer = await response.json();
+  const customer: ServerCustomer = await response.json();
   return {
     id: customer._id,
     name: customer.fullName,
     email: customer.email,
     phone: customer.phone,
-    role: customer.role as 'admin' | 'customer',
+    role: customer.role,
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&h=200&auto=format&fit=crop',
     address: `${customer.address?.street || ''}, ${customer.address?.city || ''}`,
     joinDate: new Date(customer.createdAt).toLocaleDateString('bn-BD', { year: 'numeric', month: 'long' })
@@ -109,20 +176,20 @@ export const fetchAllCustomers = async (): Promise<UserType[]> => {
   if (!response.ok) {
     return [];
   }
-  const data = await response.json();
-  return data.map((customer: any) => ({
+  const data: ServerCustomer[] = await response.json();
+  return data.map((customer: ServerCustomer) => ({
     id: customer._id,
     name: customer.fullName,
     email: customer.email,
     phone: customer.phone,
-    role: customer.role as 'admin' | 'customer',
+    role: customer.role,
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&h=200&auto=format&fit=crop',
     address: `${customer.address?.street || ''}, ${customer.address?.city || ''}`,
     joinDate: new Date(customer.createdAt).toLocaleDateString('bn-BD', { year: 'numeric', month: 'long' })
   }));
 };
 
-export const updateCustomer = async (id: string, customerData: any): Promise<any> => {
+export const updateCustomer = async (id: string, customerData: Record<string, unknown>): Promise<ApiResponse> => {
   const response = await fetch(`${API_URL}/updateCustomer/${id}`, {
     method: 'PUT',
     headers: {
@@ -131,14 +198,14 @@ export const updateCustomer = async (id: string, customerData: any): Promise<any
     },
     body: JSON.stringify(customerData),
   });
-  const data = await response.json();
+  const data: ApiResponse = await response.json();
   if (!response.ok) {
     throw new Error(data.message || 'Failed to update customer');
   }
   return data;
 };
 
-export const createOrder = async (orderData: any): Promise<any> => {
+export const createOrder = async (orderData: Record<string, unknown>): Promise<ApiResponse> => {
   const response = await fetch(`${API_URL}/addOrder`, {
     method: 'POST',
     headers: {
@@ -153,7 +220,7 @@ export const createOrder = async (orderData: any): Promise<any> => {
   return await response.json();
 };
 
-export const applyCoupon = async (code: string, orderAmount: number): Promise<any> => {
+export const applyCoupon = async (code: string, orderAmount: number): Promise<{ success: boolean; discount: number; message?: string }> => {
   const response = await fetch(`${API_URL}/coupon/apply`, {
     method: 'POST',
     headers: {
@@ -169,7 +236,7 @@ export const applyCoupon = async (code: string, orderAmount: number): Promise<an
   return data;
 };
 
-export const fetchActiveDeliveryCharges = async (): Promise<any[]> => {
+export const fetchActiveDeliveryCharges = async (): Promise<{ _id: string; name: string; charge: number }[]> => {
   const response = await fetch(`${API_URL}/deliveryCharges/active`);
   if (!response.ok) {
     throw new Error('Failed to fetch delivery charges');
@@ -177,7 +244,7 @@ export const fetchActiveDeliveryCharges = async (): Promise<any[]> => {
   return await response.json();
 };
 
-export const uploadImage = async (file: File, folder: string = 'orders'): Promise<any> => {
+export const uploadImage = async (file: File, folder: string = 'orders'): Promise<ApiResponse> => {
   const formData = new FormData();
   formData.append('image', file);
 
@@ -186,7 +253,7 @@ export const uploadImage = async (file: File, folder: string = 'orders'): Promis
     body: formData,
   });
 
-  const data = await response.json();
+  const data: ApiResponse = await response.json();
   if (!response.ok) {
     throw new Error(data.message || 'Image upload failed');
   }
@@ -195,7 +262,7 @@ export const uploadImage = async (file: File, folder: string = 'orders'): Promis
 
 // --- Authentication Endpoints ---
 
-export const authSignup = async (userData: any): Promise<any> => {
+export const authSignup = async (userData: Record<string, unknown>): Promise<ApiResponse> => {
   const response = await fetch(`${API_URL}/auth/signup`, {
     method: 'POST',
     headers: {
@@ -204,14 +271,14 @@ export const authSignup = async (userData: any): Promise<any> => {
     },
     body: JSON.stringify(userData),
   });
-  const data = await response.json();
+  const data: ApiResponse = await response.json();
   if (!response.ok) {
     throw new Error(data.message || 'Signup failed');
   }
   return data;
 };
 
-export const authLogin = async (credentials: any): Promise<any> => {
+export const authLogin = async (credentials: Record<string, unknown>): Promise<ApiResponse> => {
   const response = await fetch(`${API_URL}/auth/login`, {
     method: 'POST',
     headers: {
@@ -220,23 +287,23 @@ export const authLogin = async (credentials: any): Promise<any> => {
     },
     body: JSON.stringify(credentials),
   });
-  const data = await response.json();
+  const data: ApiResponse = await response.json();
   if (!response.ok) {
     throw new Error(data.message || 'Login failed');
   }
   return data;
 };
 
-export const authSearchCustomer = async (query: string): Promise<any> => {
+export const authSearchCustomer = async (query: string): Promise<ApiResponse<Array<{ id: string; fullName: string; email?: string; phone?: string; image?: string; hasEmail?: boolean; hasPhone?: boolean }>>> => {
   const response = await fetch(`${API_URL}/auth/search-customer?query=${encodeURIComponent(query)}`);
-  const data = await response.json();
+  const data: ApiResponse<Array<{ id: string; fullName: string; email?: string; phone?: string; image?: string; hasEmail?: boolean; hasPhone?: boolean }>> = await response.json();
   if (!response.ok) {
     throw new Error(data.message || 'Search failed');
   }
   return data;
 };
 
-export const authForgotPassword = async (customerId: string, method: 'email' | 'whatsapp'): Promise<any> => {
+export const authForgotPassword = async (customerId: string, method: 'email' | 'whatsapp'): Promise<ApiResponse> => {
   const response = await fetch(`${API_URL}/auth/forgot-password`, {
     method: 'POST',
     headers: {
@@ -245,14 +312,14 @@ export const authForgotPassword = async (customerId: string, method: 'email' | '
     },
     body: JSON.stringify({ customerId, method }),
   });
-  const data = await response.json();
+  const data: ApiResponse = await response.json();
   if (!response.ok) {
     throw new Error(data.message || 'Forgot password failed');
   }
   return data;
 };
 
-export const authChangePassword = async (passwordData: any): Promise<any> => {
+export const authChangePassword = async (passwordData: Record<string, unknown>): Promise<ApiResponse> => {
   const response = await fetch(`${API_URL}/auth/change-password`, {
     method: 'POST',
     headers: {
@@ -261,14 +328,14 @@ export const authChangePassword = async (passwordData: any): Promise<any> => {
     },
     body: JSON.stringify(passwordData),
   });
-  const data = await response.json();
+  const data: ApiResponse = await response.json();
   if (!response.ok) {
     throw new Error(data.message || 'Change password failed');
   }
   return data;
 };
 
-export const authVerifyOtp = async (verifyData: { customerId: string, otp: string }): Promise<any> => {
+export const authVerifyOtp = async (verifyData: { customerId: string, otp: string }): Promise<ApiResponse> => {
   const response = await fetch(`${API_URL}/auth/verify-otp`, {
     method: 'POST',
     headers: {
@@ -277,14 +344,14 @@ export const authVerifyOtp = async (verifyData: { customerId: string, otp: strin
     },
     body: JSON.stringify(verifyData),
   });
-  const data = await response.json();
+  const data: ApiResponse = await response.json();
   if (!response.ok) {
     throw new Error(data.message || 'OTP verification failed');
   }
   return data;
 };
 
-export const authResetPassword = async (resetData: { customerId: string, otp: string, newPassword: string }): Promise<any> => {
+export const authResetPassword = async (resetData: { customerId: string, otp: string, newPassword: string }): Promise<ApiResponse> => {
   const response = await fetch(`${API_URL}/auth/reset-password`, {
     method: 'POST',
     headers: {
@@ -293,7 +360,7 @@ export const authResetPassword = async (resetData: { customerId: string, otp: st
     },
     body: JSON.stringify(resetData),
   });
-  const data = await response.json();
+  const data: ApiResponse = await response.json();
   if (!response.ok) {
     throw new Error(data.message || 'Reset password failed');
   }

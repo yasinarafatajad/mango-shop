@@ -1,16 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { fetchCustomerById, fetchAllCustomers } from "@/lib/api";
+import { useState } from "react";
 import { 
-  User, 
   Mail, 
   Phone, 
   MapPin, 
   Calendar, 
   ChevronRight, 
-  ShoppingBag, 
-  Heart, 
   LogOut,
   Edit2
 } from "lucide-react";
@@ -20,16 +16,12 @@ import "./profile.css";
 import { UserType } from "@/lib/type";
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<UserType | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
+  const [user] = useState<UserType | null>(() => {
+    if (typeof window === 'undefined') return null;
     const savedUser = localStorage.getItem('mango_user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
-  }, []);
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+  const [loading] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('mango_user');

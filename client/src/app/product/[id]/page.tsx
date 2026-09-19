@@ -92,6 +92,7 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
         >
           <Heart size={24} fill={isFavorite ? "#ff4d4d" : "none"} color={isFavorite ? "#ff4d4d" : "#1A1A1A"} />
         </button>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={mango.image} alt={mango.nameBn} className="details-image" />
       </div>
 

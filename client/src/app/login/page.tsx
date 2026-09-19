@@ -33,12 +33,13 @@ export default function LoginPage() {
             try {
                 const response = await authLogin({ email: email.trim(), password });
                 if (response.success) {
-                    localStorage.setItem('mango_user', JSON.stringify(response.user));
-                    localStorage.setItem('mango_token', response.token);
+                    if (response.user) localStorage.setItem('mango_user', JSON.stringify(response.user));
+                    if (response.token) localStorage.setItem('mango_token', response.token);
                     window.location.href = '/';
                 }
-            } catch (err: any) {
-                setError(err.message || 'লগইন ব্যর্থ হয়েছে');
+            } catch (err: unknown) {
+                const msg = err instanceof Error ? err.message : 'লগইন ব্যর্থ হয়েছে';
+                setError(msg);
             } finally {
                 setLoading(false);
             }
@@ -48,9 +49,10 @@ export default function LoginPage() {
     return (
         <div className="auth-container">
             <div className="auth-image-section">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/auth-login.png" alt="Inspiration" />
                 <div className="auth-image-overlay">
-                    <h2 className="auth-quote">"প্রকৃতির শ্রেষ্ঠ দান, সরাসরি আপনার দ্বারে।"</h2>
+                    <h2 className="auth-quote">&quot;প্রকৃতির শ্রেষ্ঠ দান, সরাসরি আপনার দ্বারে।&quot;</h2>
                     <p className="auth-author">— ম্যাঙ্গো শপ</p>
                 </div>
             </div>
@@ -120,6 +122,7 @@ export default function LoginPage() {
                         </div>
 
                         <button type="button" className="social-btn">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="20" />
                             গুগল দিয়ে লগইন করুন
                         </button>
