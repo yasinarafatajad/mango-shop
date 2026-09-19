@@ -1,0 +1,102 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+    /* Backgrounds */
+    --color-background: #f8faf4;        /* light green-gray tint */
+    --color-foreground: #2b2b2b;        /* dark gray matching frontend */
+
+    --color-card: #ffffff;               /* white */
+    --color-card-foreground: #2b2b2b;   /* dark gray */
+
+    --color-popover: #ffffff;            /* white */
+    --color-popover-foreground: #2b2b2b; /* dark gray */
+
+    /* Primary / Secondary */
+    --color-primary: #96c160;            /* brand green */
+    --color-primary-half: rgba(150, 193, 96, 0.5);        /* brand green half opacity */
+    --color-primary-foreground: #ffffff; /* white */
+
+    --color-secondary: #eef6e4;          /* brand light green */
+    --color-secondary-foreground: #2b2b2b; /* brand dark */
+
+    --color-muted: #eef6e4;              /* brand light green */
+    --color-muted-foreground: #5e6b52;   /* slate green-gray */
+
+    --color-accent: #84ad4f;             /* brand hover dark green */
+    --color-accent-foreground: #ffffff;  /* white */
+
+    --color-destructive: #ff2a26;        /* red */
+    --color-destructive-foreground: #ffffff; /* white */
+
+    --color-success: #96c160;            /* brand green */
+    --color-success-foreground: #ffffff; /* white */
+
+    --color-warning: #f39c12;            /* badge orange */
+    --color-warning-foreground: #ffffff; /* white */
+
+    /* Borders / Inputs / Rings */
+    --color-border: #d1d5db;             /* light gray */
+    --color-input: #d1d5db;              /* light gray */
+    --color-ring: #96c160;               /* brand green */
+
+    /* Radius */
+    --color-radius: 0.75rem;
+
+    /* Sidebar */
+    --color-sidebar-background: #ffffff;           /* white */
+    --color-sidebar-foreground: #2b2b2b;           /* dark gray */
+    --color-sidebar-primary: #96c160;              /* brand green */
+    --color-sidebar-primary-foreground: #ffffff;   /* white */
+    --color-sidebar-accent: #eef6e4;               /* brand light green */
+    --color-sidebar-accent-foreground: #2b2b2b;    /* dark gray */
+    --color-sidebar-border: #e1e3eb;               /* light gray */
+    --color-sidebar-ring: #96c160;                 /* brand green */
+
+    /* Nav */
+    --color-nav-height: 4rem;
+    --color-bottom-nav-height: 5rem;
+}
+
+
+ body {
+    @apply font-sans antialiased;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    overscroll-behavior: none;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @keyframes blob {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0px, 0px) scale(1); }
+  }
+
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
