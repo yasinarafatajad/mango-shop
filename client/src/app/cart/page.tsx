@@ -1,24 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Minus, Plus, Trash2, ArrowLeft, ShoppingCart, ChevronRight } from 'lucide-react';
+import { Minus, Plus, Trash2, ArrowLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { getCart, updateCartQuantity, removeFromCart } from '@/lib/storage';
+import { getCart, updateCartQuantity, removeFromCart, CartItem } from '@/lib/storage';
 import './Cart.css';
 
 export default function Cart() {
-  const [cartItems, setCartItems] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const refreshCart = () => {
-    setCartItems(getCart());
-    setLoading(false);
-  };
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => typeof window !== 'undefined' ? getCart() : []);
+  const [loading] = useState(false);
 
   useEffect(() => {
-    refreshCart();
-    window.addEventListener('cart-updated', refreshCart);
-    return () => window.removeEventListener('cart-updated', refreshCart);
+    const handleCartUpdate = () => {
+      setCartItems(getCart());
+    };
+    window.addEventListener('cart-updated', handleCartUpdate);
+    return () => window.removeEventListener('cart-updated', handleCartUpdate);
   }, []);
 
   const handleUpdateQuantity = (id: string, delta: number) => {
@@ -57,7 +54,8 @@ export default function Cart() {
           <div className="cart-items">
             {cartItems.map((item) => (
               <div key={item.id} className="cart-item">
-                <img src={item.image} alt={item.nameBn} className="cart-item-image" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={item.image} alt={item.nameBn || item.title || 'Product'} className="cart-item-image" />
                 <div className="cart-item-details">
                   <div>
                     <div className="flex justify-between items-center">

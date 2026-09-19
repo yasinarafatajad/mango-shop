@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { updateCustomer, uploadImage } from "@/lib/api";
 import { UserType } from "@/lib/type";
 import { 
@@ -18,23 +18,16 @@ import "../profile.css";
 import "../../Auth.css";
 
 export default function EditProfilePage() {
-  const [user, setUser] = useState<UserType | null>(null);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
-
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
+  const [user] = useState<UserType | null>(() => {
+    if (typeof window === 'undefined') return null;
     const savedUser = localStorage.getItem('mango_user');
-    if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-      setUser(parsedUser);
-      setImagePreview(parsedUser.image || "");
-    }
-    setLoading(false);
-  }, []);
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+  const [loading, setLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>(() => user?.image || "");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -60,14 +53,16 @@ export default function EditProfilePage() {
     const address = formData.get('address') as string;
 
     try {
-      let imageUrl = user.image;
+      let imageUrl = user.image || '';
 
       if (selectedFile) {
         const uploadRes = await uploadImage(selectedFile, 'customers');
-        imageUrl = uploadRes.url;
+        if (uploadRes.url) {
+          imageUrl = uploadRes.url;
+        }
       }
 
-      const response = await updateCustomer(user.id || (user as any)._id, {
+      const response = await updateCustomer(user.id || user._id || '', {
         fullName,
         email,
         phone,
@@ -211,6 +206,7 @@ export default function EditProfilePage() {
       </div>
 
       <div className="auth-image-section">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/auth-profile-edit.png" alt="Inspiration" />
         <div className="auth-image-overlay">
           <p className="auth-quote">আপনার প্রোফাইল, আপনার পরিচয়।</p>

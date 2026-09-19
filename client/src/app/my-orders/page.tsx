@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ChevronRight, Package, Clock, CheckCircle2 } from 'lucide-react';
+import { Package, Clock, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { fetchOrders } from '@/lib/api';
 import { Order } from '@/lib/type';
@@ -9,25 +9,21 @@ import './MyOrders.css';
 
 export default function MyOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [user] = useState(() => {
+    if (typeof window === 'undefined') return null;
+    const savedUser = localStorage.getItem('mango_user');
+    if (!savedUser) return null;
+    try { return JSON.parse(savedUser); } catch { return null; }
+  });
+  const [loading, setLoading] = useState(() => !!user);
   
   useEffect(() => {
-    const savedUser = localStorage.getItem('mango_user');
-    if (savedUser) {
-      const user = JSON.parse(savedUser);
-      fetchOrders(user.email, user.phone)
-        .then(data => {
-          setOrders(data);
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error(err);
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-    }
-  }, []);
+    if (!user) return;
+    fetchOrders(user.email, user.phone)
+      .then(data => setOrders(data))
+      .catch(err => console.error(err))
+      .finally(() => setLoading(false));
+  }, [user]);
 
   const getStatusLabel = (status: string) => {
     switch (status) {
@@ -91,6 +87,7 @@ export default function MyOrders() {
               <div className="order-content">
                 <div className="order-thumbs">
                   {order.items.slice(0, 3).map((item, idx) => (
+                    /* eslint-disable-next-line @next/next/no-img-element */
                     <img key={idx} src={item.image} alt={item.name} className="order-thumb" />
                   ))}
                   {order.items.length > 3 && (

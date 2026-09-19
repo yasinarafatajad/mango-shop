@@ -1,18 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Home, ShoppingBag, Heart, User, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const user = localStorage.getItem('mango_user');
-    setIsLoggedIn(!!user);
-  }, []);
+  const [isLoggedIn] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return !!localStorage.getItem('mango_user');
+  });
 
   const navItems = [
     { icon: Home, label: 'হোম', path: '/' },

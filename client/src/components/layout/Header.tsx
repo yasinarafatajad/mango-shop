@@ -20,17 +20,17 @@ export default function Header() {
   const isHomePage = pathname === "/";
   
   const [searchQuery, setSearchQuery] = useState("");
-  const [suggestions, setSuggestions] = useState<Mango[]>([]);
   const [allProducts, setAllProducts] = useState<Mango[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [cartCount, setCartCount] = useState(() => {
+    if (typeof window === 'undefined') return 0;
+    return getCart().reduce((sum, item) => sum + item.quantity, 0);
+  });
+  const [isLoggedIn] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return !!localStorage.getItem('mango_user');
+  });
   const searchRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const user = localStorage.getItem('mango_user');
-    setIsLoggedIn(!!user);
-  }, []);
 
   useEffect(() => {
     fetchProducts().then(setAllProducts).catch(console.error);
@@ -40,24 +40,16 @@ export default function Header() {
       setCartCount(cart.reduce((sum, item) => sum + item.quantity, 0));
     };
 
-    updateCount();
     window.addEventListener('cart-updated', updateCount);
     return () => window.removeEventListener('cart-updated', updateCount);
   }, []);
 
-  useEffect(() => {
-    if (searchQuery.trim().length > 0) {
-      const filtered = allProducts.filter(p => 
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        p.nameBn.includes(searchQuery)
-      ).slice(0, 5);
-      setSuggestions(filtered);
-      setShowSuggestions(true);
-    } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-    }
-  }, [searchQuery, allProducts]);
+  const suggestions = searchQuery.trim().length > 0
+    ? allProducts.filter(p => 
+        (p.name?.toLowerCase() || '').includes(searchQuery.toLowerCase()) || 
+        (p.nameBn || '').includes(searchQuery)
+      ).slice(0, 5)
+    : [];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -96,8 +88,11 @@ export default function Header() {
                   placeholder="পণ্য সার্চ করুন.."
                   className="search-input"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => searchQuery && setShowSuggestions(true)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowSuggestions(e.target.value.trim().length > 0);
+                  }}
+                  onFocus={() => searchQuery.trim().length > 0 && setShowSuggestions(true)}
                 />
               </div>
               
@@ -109,6 +104,7 @@ export default function Header() {
                       className="suggestion-item"
                       onClick={() => handleSuggestionClick(product.id)}
                     >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={product.image} alt={product.nameBn} className="suggestion-image" />
                       <div className="suggestion-info">
                         <div className="suggestion-name">{product.nameBn}</div>

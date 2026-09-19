@@ -57,12 +57,13 @@ export default function RegisterPage() {
                     image: imageUrl || undefined
                 });
                 if (response.success) {
-                    localStorage.setItem('mango_user', JSON.stringify(response.user));
-                    localStorage.setItem('mango_token', response.token);
+                    if (response.user) localStorage.setItem('mango_user', JSON.stringify(response.user));
+                    if (response.token) localStorage.setItem('mango_token', response.token);
                     window.location.href = '/';
                 }
-            } catch (err: any) {
-                setError(err.message || 'রেজিস্ট্রেশন ব্যর্থ হয়েছে');
+            } catch (err: unknown) {
+                const msg = err instanceof Error ? err.message : 'রেজিস্ট্রেশন ব্যর্থ হয়েছে';
+                setError(msg);
             } finally {
                 setLoading(false);
             }
@@ -72,9 +73,10 @@ export default function RegisterPage() {
     return (
         <div className="auth-container">
             <div className="auth-image-section">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/auth-register.png" alt="Inspiration" />
                 <div className="auth-image-overlay">
-                    <h2 className="auth-quote">"সেরা মানের আম, সরাসরি রাজশাহী থেকে আপনার ঘরে।"</h2>
+                    <h2 className="auth-quote">&quot;সেরা মানের আম, সরাসরি রাজশাহী থেকে আপনার ঘরে।&quot;</h2>
                     <p className="auth-author">— ম্যাঙ্গো শপ</p>
                 </div>
             </div>
@@ -107,6 +109,7 @@ export default function RegisterPage() {
                                 onClick={() => document.getElementById('profile-image-upload')?.click()}
                             >
                                 {imagePreview ? (
+                                    /* eslint-disable-next-line @next/next/no-img-element */
                                     <img src={imagePreview} alt="Profile preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 ) : (
                                     <ImagePlus size={32} color="#9ca3af" />

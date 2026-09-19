@@ -15,30 +15,47 @@ import {
     AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { createOrder, applyCoupon as applyCouponApi, fetchActiveDeliveryCharges, uploadImage } from '@/lib/api';
 import { getCart } from '@/lib/storage';
+import { Mango } from '@/lib/type';
 import './Checkout.css';
 
+interface DeliveryChargeOption {
+    _id: string;
+    name: string;
+    charge: number;
+}
+
 export default function Checkout() {
-    const router = useRouter();
     const [paymentMethod, setPaymentMethod] = useState('cod');
     const [isOrdered, setIsOrdered] = useState(false);
     const [screenshot, setScreenshot] = useState<File | null>(null);
     const [isCopied, setIsCopied] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [cartItems, setCartItems] = useState<any[]>([]);
+    const [cartItems] = useState<Mango[]>(() => typeof window !== 'undefined' ? getCart() : []);
     const [error, setError] = useState<string | null>(null);
     
     // Delivery charge logic
-    const [deliveryCharges, setDeliveryCharges] = useState<any[]>([]);
+    const [deliveryCharges, setDeliveryCharges] = useState<DeliveryChargeOption[]>([]);
     const [selectedChargeId, setSelectedChargeId] = useState<string>('');
     const [deliveryChargeAmount, setDeliveryChargeAmount] = useState(0);
     
-    // Form fields
-    const [fullName, setFullName] = useState('');
-    const [phone, setPhone] = useState('');
-    const [address, setAddress] = useState('');
+    // Form fields initialized from saved user
+    const [savedUser] = useState(() => {
+        if (typeof window === 'undefined') return null;
+        const val = localStorage.getItem('mango_user');
+        if (!val) return null;
+        try { return JSON.parse(val); } catch { return null; }
+    });
+    const [fullName, setFullName] = useState(() => savedUser?.name || savedUser?.fullName || '');
+    const [phone, setPhone] = useState(() => savedUser?.phone || '');
+    const [address, setAddress] = useState(() => {
+        const addr = savedUser?.address;
+        if (typeof addr === 'object' && addr) {
+            return `${addr.street || ''} ${addr.city || ''} ${addr.district || ''}`.trim();
+        }
+        return addr || '';
+    });
     const [trxId, setTrxId] = useState('');
     const [senderNumber, setSenderNumber] = useState('');
 
@@ -50,21 +67,6 @@ export default function Checkout() {
     const paymentNumber = "01712-972683";
 
     useEffect(() => {
-        setCartItems(getCart());
-        
-        const savedUser = localStorage.getItem('mango_user');
-        if (savedUser) {
-            const user = JSON.parse(savedUser);
-            setFullName(user.name || user.fullName || '');
-            setPhone(user.phone || '');
-            const addr = user.address;
-            if (typeof addr === 'object' && addr) {
-                setAddress(`${addr.street || ''} ${addr.city || ''} ${addr.district || ''}`.trim());
-            } else {
-                setAddress(addr || '');
-            }
-        }
-        
         fetchActiveDeliveryCharges()
             .then(charges => {
                 if (charges && charges.length > 0) {
@@ -72,7 +74,7 @@ export default function Checkout() {
                     setSelectedChargeId(charges[0]._id);
                     setDeliveryChargeAmount(charges[0].charge);
                 } else {
-                    const fallback = [{ _id: 'fallback', name: 'Standard Delivery', charge: 50 }];
+                    const fallback: DeliveryChargeOption[] = [{ _id: 'fallback', name: 'Standard Delivery', charge: 50 }];
                     setDeliveryCharges(fallback);
                     setSelectedChargeId('fallback');
                     setDeliveryChargeAmount(50);
@@ -80,7 +82,7 @@ export default function Checkout() {
             })
             .catch(err => {
                 console.error("Error fetching delivery charges:", err);
-                const fallback = [{ _id: 'fallback', name: 'Standard Delivery', charge: 50 }];
+                const fallback: DeliveryChargeOption[] = [{ _id: 'fallback', name: 'Standard Delivery', charge: 50 }];
                 setDeliveryCharges(fallback);
                 setSelectedChargeId('fallback');
                 setDeliveryChargeAmount(50);
@@ -109,7 +111,7 @@ export default function Checkout() {
         setTimeout(() => setIsCopied(false), 2000);
     };
 
-    const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const subtotal = cartItems.reduce((acc, item) => acc + item.price * (item.quantity ?? 1), 0);
 
     const applyCoupon = async () => {
         if (!couponCode) return;
@@ -119,9 +121,10 @@ export default function Checkout() {
             const data = await applyCouponApi(couponCode, subtotal);
             setDiscount(data.discount);
             setCouponStatus({ type: 'success', message: `${data.discount}৳ ডিসকাউন্ট সফলভাবে যুক্ত হয়েছে!` });
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : 'সঠিক কুপন কোড দিন।';
             setDiscount(0);
-            setCouponStatus({ type: 'error', message: err.message || 'সঠিক কুপন কোড দিন।' });
+            setCouponStatus({ type: 'error', message: msg });
         } finally {
             setLoading(false);
         }
@@ -163,7 +166,7 @@ export default function Checkout() {
             let screenshotUrl = '';
             if (screenshot) {
                 const uploadRes = await uploadImage(screenshot);
-                screenshotUrl = uploadRes.url;
+                screenshotUrl = uploadRes.url || '';
             }
 
             const orderItems = cartItems.map(p => ({
@@ -201,9 +204,10 @@ export default function Checkout() {
             localStorage.removeItem('mango_shop_cart');
             window.dispatchEvent(new Event('cart-updated'));
             setIsOrdered(true);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(err);
-            setError(err.message || 'অর্ডার প্লেস করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+            const msg = err instanceof Error ? err.message : 'অর্ডার প্লেস করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।';
+            setError(msg);
         } finally {
             setLoading(false);
         }
@@ -379,6 +383,7 @@ export default function Checkout() {
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                 <span>{screenshot.name}</span>
                                             </div>
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
                                             <img
                                                 src={URL.createObjectURL(screenshot)}
                                                 alt="Preview"

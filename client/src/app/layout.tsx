@@ -27,7 +27,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html>
+    <html lang="bn" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="app-container pb-24">
         <Header />
         <div style={{ minHeight: "calc(100vh - 300px)" }}>

@@ -8,18 +8,15 @@ import { addToCart, toggleWishlist, isInWishlist } from '@/lib/storage';
 import { Mango } from '@/lib/type';
 
 interface ProductCardProps {
-  mango: any; // Using any to handle both full Mango and simplified props
+  mango: Mango;
 }
 
 export default function ProductCard({ mango }: ProductCardProps) {
-  console.log(mango);  
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(() => typeof window !== 'undefined' ? isInWishlist(mango.id) : false);
   const pathname = usePathname();
   const isWishlistPage = pathname === "/wishlist";
 
   useEffect(() => {
-    setIsLiked(isInWishlist(mango.id));
-    
     const handleWishlistUpdate = () => {
       setIsLiked(isInWishlist(mango.id));
     };
@@ -31,19 +28,20 @@ export default function ProductCard({ mango }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addToCart(mango as Mango);
+    addToCart(mango);
   };
 
   const handleAddToWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleWishlist(mango as Mango);
+    toggleWishlist(mango);
   };
 
   return (
     <div className="product-card group">
       <div className="relative overflow-hidden aspect-square">
         <Link href={`/product/${mango.id}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={mango.image}
             alt={mango.nameBn}
