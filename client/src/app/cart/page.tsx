@@ -7,10 +7,12 @@ import { getCart, updateCartQuantity, removeFromCart, CartItem } from '@/lib/sto
 import './Cart.css';
 
 export default function Cart() {
-  const [cartItems, setCartItems] = useState<CartItem[]>(() => typeof window !== 'undefined' ? getCart() : []);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
+    setCartItems(getCart());
     const handleCartUpdate = () => {
       setCartItems(getCart());
     };
@@ -18,8 +20,18 @@ export default function Cart() {
     return () => window.removeEventListener('cart-updated', handleCartUpdate);
   }, []);
 
+  useEffect(() => {
+    if (errorMsg) {
+      const timer = setTimeout(() => setErrorMsg(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMsg]);
+
   const handleUpdateQuantity = (id: string, delta: number) => {
-    updateCartQuantity(id, delta);
+    const res = updateCartQuantity(id, delta);
+    if (!res.success && res.message) {
+      setErrorMsg(res.message);
+    }
   };
 
   const handleRemoveItem = (id: string) => {
@@ -40,6 +52,12 @@ export default function Cart() {
         <span>আপনার কার্ট ({cartItems.length})</span>
       </div>
 
+      {errorMsg && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm font-medium">
+          {errorMsg}
+        </div>
+      )}
+
       {cartItems.length === 0 ? (
         <div className="empty-cart">
           <div className="empty-cart-icon">🛒</div>
@@ -52,42 +70,53 @@ export default function Cart() {
       ) : (
         <div className="cart-content-layout">
           <div className="cart-items">
-            {cartItems.map((item) => (
-              <div key={item.id} className="cart-item">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.image} alt={item.nameBn || item.title || 'Product'} className="cart-item-image" />
-                <div className="cart-item-details">
-                  <div>
-                    <div className="flex justify-between items-center">
-                      <h3 className="cart-item-name">{item.nameBn}</h3>
-                      <button onClick={() => handleRemoveItem(item.id)} className="remove-btn">
-                        <Trash2 size={16} />
-                      </button>
+            {cartItems.map((item) => {
+              const maxStock = item.stock !== undefined ? item.stock : 9999;
+              const isAtMax = item.quantity >= maxStock;
+              return (
+                <div key={item.id} className="cart-item">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={item.image} alt={item.nameBn || item.title || 'Product'} className="cart-item-image" />
+                  <div className="cart-item-details">
+                    <div>
+                      <div className="flex justify-between items-center">
+                        <h3 className="cart-item-name">{item.nameBn}</h3>
+                        <button onClick={() => handleRemoveItem(item.id)} className="remove-btn">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                      <p className="cart-item-price">
+                        ৳{item.price} / {item.unit}
+                        {item.stock !== undefined && (
+                          <span className="text-xs text-gray-500 ml-2">(স্টক: {item.stock} টি)</span>
+                        )}
+                      </p>
                     </div>
-                    <p className="cart-item-price">৳{item.price} / {item.unit}</p>
-                  </div>
-                  
-                  <div className="cart-item-controls">
-                    <div className="quantity-controls">
-                      <button 
-                        onClick={() => handleUpdateQuantity(item.id, -1)} 
-                        className="qty-btn"
-                      >
-                        <Minus size={14} />
-                      </button>
-                      <span className="font-bold">{item.quantity}</span>
-                      <button 
-                        onClick={() => handleUpdateQuantity(item.id, 1)} 
-                        className="qty-btn"
-                      >
-                        <Plus size={14} />
-                      </button>
+                    
+                    <div className="cart-item-controls">
+                      <div className="quantity-controls">
+                        <button 
+                          onClick={() => handleUpdateQuantity(item.id, -1)} 
+                          className="qty-btn"
+                          disabled={item.quantity <= 1}
+                        >
+                          <Minus size={14} />
+                        </button>
+                        <span className="font-bold">{item.quantity}</span>
+                        <button 
+                          onClick={() => handleUpdateQuantity(item.id, 1)} 
+                          className={`qty-btn ${isAtMax ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          disabled={isAtMax}
+                        >
+                          <Plus size={14} />
+                        </button>
+                      </div>
+                      <span className="font-bold">৳{item.price * item.quantity}</span>
                     </div>
-                    <span className="font-bold">৳{item.price * item.quantity}</span>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="cart-sidebar">

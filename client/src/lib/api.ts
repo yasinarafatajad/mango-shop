@@ -7,6 +7,7 @@ interface ServerProduct {
   title: string;
   description?: string;
   price: number;
+  stock?: number;
   status: string;
   tags?: string[];
   images?: { url?: string }[];
@@ -67,7 +68,7 @@ const mapProductToMango = (product: ServerProduct): Mango => ({
   category: product.category?.name || 'General',  
   isActive: product.status === 'active',
   sku: '',
-  stock: 0,
+  stock: product.stock !== undefined ? product.stock : 9999,
   color: [],
   size: [],
   status: product.status === 'active' ? 'active' : 'draft',

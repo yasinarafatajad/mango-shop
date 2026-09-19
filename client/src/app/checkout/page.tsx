@@ -16,8 +16,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { createOrder, applyCoupon as applyCouponApi, fetchActiveDeliveryCharges, uploadImage } from '@/lib/api';
-import { getCart } from '@/lib/storage';
-import { Mango } from '@/lib/type';
+import { getCart, CartItem } from '@/lib/storage';
 import './Checkout.css';
 
 interface DeliveryChargeOption {
@@ -32,7 +31,7 @@ export default function Checkout() {
     const [screenshot, setScreenshot] = useState<File | null>(null);
     const [isCopied, setIsCopied] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [cartItems] = useState<Mango[]>(() => typeof window !== 'undefined' ? getCart() : []);
+    const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [error, setError] = useState<string | null>(null);
     
     // Delivery charge logic
@@ -41,23 +40,34 @@ export default function Checkout() {
     const [deliveryChargeAmount, setDeliveryChargeAmount] = useState(0);
     
     // Form fields initialized from saved user
-    const [savedUser] = useState(() => {
-        if (typeof window === 'undefined') return null;
-        const val = localStorage.getItem('mango_user');
-        if (!val) return null;
-        try { return JSON.parse(val); } catch { return null; }
-    });
-    const [fullName, setFullName] = useState(() => savedUser?.name || savedUser?.fullName || '');
-    const [phone, setPhone] = useState(() => savedUser?.phone || '');
-    const [address, setAddress] = useState(() => {
-        const addr = savedUser?.address;
-        if (typeof addr === 'object' && addr) {
-            return `${addr.street || ''} ${addr.city || ''} ${addr.district || ''}`.trim();
-        }
-        return addr || '';
-    });
+    const [fullName, setFullName] = useState('');
+    const [phone, setPhone] = useState('');
+    const [address, setAddress] = useState('');
     const [trxId, setTrxId] = useState('');
     const [senderNumber, setSenderNumber] = useState('');
+
+    useEffect(() => {
+        setCartItems(getCart());
+
+        const saved = localStorage.getItem('mango_user');
+        if (saved) {
+            try {
+                const user = JSON.parse(saved);
+                if (user?.name || user?.fullName) setFullName(user.name || user.fullName);
+                if (user?.phone) setPhone(user.phone);
+                if (user?.address) {
+                    const addr = user.address;
+                    if (typeof addr === 'object' && addr) {
+                        setAddress(`${addr.street || ''} ${addr.city || ''} ${addr.district || ''}`.trim());
+                    } else if (typeof addr === 'string') {
+                        setAddress(addr);
+                    }
+                }
+            } catch {
+                // ignore JSON parse error
+            }
+        }
+    }, []);
 
     // Coupon logic
     const [couponCode, setCouponCode] = useState('');
@@ -148,6 +158,20 @@ export default function Checkout() {
         if (cartItems.length === 0) {
             setError('আপনার কার্ট খালি।');
             return;
+        }
+
+        // Check if any cart item quantity exceeds available stock limit
+        for (const item of cartItems) {
+            const maxStock = item.stock !== undefined ? item.stock : 9999;
+            const qty = item.quantity ?? 1;
+            if (maxStock <= 0) {
+                setError(`'${item.nameBn || item.name}' পণ্যটি আউট অব স্টক (Out of Stock)। কার্ট থেকে রিমুভ করুন।`);
+                return;
+            }
+            if (qty > maxStock) {
+                setError(`'${item.nameBn || item.name}' পণ্যের স্টকে মাত্র ${maxStock} টি এভেলেবল আছে, কিন্তু আপনি ${qty} টি সিলেক্ট করেছেন।`);
+                return;
+            }
         }
 
         if (paymentMethod !== 'cod') {

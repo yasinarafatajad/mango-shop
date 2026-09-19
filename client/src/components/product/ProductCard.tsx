@@ -25,9 +25,12 @@ export default function ProductCard({ mango }: ProductCardProps) {
     return () => window.removeEventListener('wishlist-updated', handleWishlistUpdate);
   }, [mango.id]);
 
+  const isOutOfStock = mango.stock !== undefined && mango.stock <= 0;
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (isOutOfStock) return;
     addToCart(mango);
   };
 
@@ -70,7 +73,12 @@ export default function ProductCard({ mango }: ProductCardProps) {
           <div className="product-price">
             ৳{mango.price} <span className="product-unit">/ {mango.unit}</span>
           </div>
-          <button onClick={handleAddToCart} className="add-btn">
+          <button 
+            onClick={handleAddToCart} 
+            className={`add-btn ${isOutOfStock ? 'opacity-40 cursor-not-allowed' : ''}`}
+            disabled={isOutOfStock}
+            title={isOutOfStock ? 'স্টক শেষ' : 'কার্টে যোগ করুন'}
+          >
             <Plus size={18} />
           </button>
         </div>
