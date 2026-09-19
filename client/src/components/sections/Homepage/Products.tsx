@@ -34,8 +34,8 @@ export default function Products() {
             </div>
 
             <div className="products-grid">
-                {products.slice(0, totalProducts).map((mango) => (
-                    <ProductCard key={mango._id} mango={mango} />
+                {products.slice(0, totalProducts).map((mango, i) => (
+                    <ProductCard key={i} mango={mango} />
                 ))}
             </div>
         </section>
