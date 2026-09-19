@@ -66,7 +66,7 @@ export default function AllProducts() {
           <>
             <div className="products-grid">
               {currentItems.map((mango) => (
-                <ProductCard key={mango.id} mango={mango} />
+                <ProductCard key={mango._id} mango={mango} />
               ))}
             </div>
 

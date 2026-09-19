@@ -12,6 +12,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ mango }: ProductCardProps) {
+  console.log(mango);  
   const [isLiked, setIsLiked] = useState(false);
   const pathname = usePathname();
   const isWishlistPage = pathname === "/wishlist";
