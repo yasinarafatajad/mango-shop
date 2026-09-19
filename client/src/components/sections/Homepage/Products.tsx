@@ -9,7 +9,7 @@ import Link from "next/link";
 export default function Products() {
     const [products, setProducts] = useState<Mango[]>([]);
     const [loading, setLoading] = useState(true);
-    const totalProducts = 5;
+    const totalProducts = 12;
 
     useEffect(() => {
         fetchProducts()
@@ -35,7 +35,7 @@ export default function Products() {
 
             <div className="products-grid">
                 {products.slice(0, totalProducts).map((mango) => (
-                    <ProductCard key={mango.id} mango={mango} />
+                    <ProductCard key={mango._id} mango={mango} />
                 ))}
             </div>
         </section>

@@ -47,7 +47,7 @@ export default function Wishlist() {
       ) : (
         <div className="products-grid">
           {wishlistItems.map((mango) => (
-            <div key={mango.id} style={{ position: 'relative' }}>
+            <div key={mango._id} style={{ position: 'relative' }}>
               <ProductCard mango={mango} />
               <button 
                 onClick={() => removeFromWishlist(mango)}

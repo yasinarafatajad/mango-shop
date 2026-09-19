@@ -1,13 +1,41 @@
+// export interface Mango {
+//   id: string;
+//   name: string;
+//   nameBn: string;
+//   price: number;
+//   unit: string;
+//   image: string;
+//   descriptionBn: string;
+//   category: string;
+//   isActive?: boolean;
+// }
+
+export interface mangoImage {
+  url: string;
+  alt?: string;
+}
+
 export interface Mango {
-  id: string;
-  name: string;
-  nameBn: string;
+  _id: string;
+  title: string;
+  name?: string;
+  description?: string;
+  sku: string;
+  category: string; // References Category document
+  images: mangoImage[];
+  color: string[];
+  size: string[];
   price: number;
-  unit: string;
-  image: string;
-  descriptionBn: string;
-  category: string;
-  isActive?: boolean;
+  compareAtPrice?: number;
+  stock: number;
+  brand?: string;
+  tags?: string[];
+  rating?: number;
+  featured?: boolean;
+  features?: string[];
+  status: "draft" | "active";
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Order {
