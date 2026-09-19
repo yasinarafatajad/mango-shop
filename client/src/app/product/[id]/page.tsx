@@ -16,6 +16,7 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string>('');
   const router = useRouter();
 
   const stockLimit = mango?.stock !== undefined ? mango.stock : 9999;
@@ -112,20 +113,59 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
     }
   };
 
+  const productImages = mango?.images && mango.images.length > 0 
+    ? mango.images.map(img => img.url).filter((url): url is string => Boolean(url))
+    : (mango?.image ? [mango.image] : []);
+
+  const defaultFallbackImg = 'https://images.unsplash.com/photo-1553279768-865429fa0078?q=80&w=400&h=400&auto=format&fit=crop';
+  const activeImage = selectedImage || productImages[0] || mango?.image || defaultFallbackImg;
+
+  const handleImgError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.src = defaultFallbackImg;
+  };
+
   return (
     <div className="product-details-page">
-      <div className="details-header">
-        <Link href="/" className="back-btn-details">
-          <ArrowLeft size={24} />
-        </Link>
-        <button
-          className="wish-btn "
-          onClick={handleAddToWishlist}
-        >
-          <Heart size={24} fill={isFavorite ? "#ff4d4d" : "none"} color={isFavorite ? "#ff4d4d" : "#1A1A1A"} />
-        </button>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={mango.image} alt={mango.nameBn} className="details-image" />
+      <div className="details-header-container">
+        <div className="details-header">
+          <Link href="/" className="back-btn-details">
+            <ArrowLeft size={24} />
+          </Link>
+          <button
+            className="wish-btn "
+            onClick={handleAddToWishlist}
+          >
+            <Heart size={24} fill={isFavorite ? "#ff4d4d" : "none"} color={isFavorite ? "#ff4d4d" : "#1A1A1A"} />
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img 
+            src={activeImage} 
+            alt={mango.nameBn} 
+            className="details-image" 
+            onError={handleImgError}
+          />
+        </div>
+
+        {productImages.length > 1 && (
+          <div className="thumbnails-wrapper">
+            {productImages.map((imgUrl, idx) => (
+              <button
+                key={idx}
+                type="button"
+                className={`thumbnail-btn ${activeImage === imgUrl ? 'active' : ''}`}
+                onClick={() => setSelectedImage(imgUrl)}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img 
+                  src={imgUrl} 
+                  alt={`${mango.nameBn} ${idx + 1}`} 
+                  className="thumbnail-img" 
+                  onError={handleImgError}
+                />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="details-content">

@@ -10,7 +10,8 @@ interface ServerProduct {
   stock?: number;
   status: string;
   tags?: string[];
-  images?: { url?: string }[];
+  images?: ({ url?: string } | string)[];
+  src?: (string | { url?: string })[];
   category?: { name?: string };
 }
 
@@ -57,24 +58,42 @@ interface ApiResponse<T = unknown> {
 }
 
 // Mapper to convert server product to client Mango type
-const mapProductToMango = (product: ServerProduct): Mango => ({
-  id: product._id,
-  name: product.title,
-  nameBn: product.tags?.find((tag: string) => tag.startsWith('bn:'))?.replace('bn:', '') || product.title,
-  price: product.price,
-  unit: product.tags?.find((tag: string) => tag.startsWith('unit:'))?.replace('unit:', '') || 'কেজি',
-  image: product.images?.[0]?.url || 'https://images.unsplash.com/photo-1553279768-865429fa0078?q=80&w=400&h=400&auto=format&fit=crop',
-  descriptionBn: product.description || '',
-  category: product.category?.name || 'General',  
-  isActive: product.status === 'active',
-  sku: '',
-  stock: product.stock !== undefined ? product.stock : 9999,
-  color: [],
-  size: [],
-  status: product.status === 'active' ? 'active' : 'draft',
-  createdAt: new Date(),
-  updatedAt: new Date()
-});
+const mapProductToMango = (product: ServerProduct): Mango => {
+  const rawList = (product.images && product.images.length > 0)
+    ? product.images
+    : (product.src && product.src.length > 0 ? product.src : []);
+
+  const parsedImages = rawList
+    .map(img => {
+      if (typeof img === 'string') return { url: img };
+      if (img && typeof img === 'object' && img.url) return { url: img.url };
+      return null;
+    })
+    .filter((img): img is { url: string } => Boolean(img && img.url));
+
+  const defaultImg = 'https://images.unsplash.com/photo-1553279768-865429fa0078?q=80&w=400&h=400&auto=format&fit=crop';
+  const images = parsedImages.length > 0 ? parsedImages : [{ url: defaultImg }];
+
+  return {
+    id: product._id,
+    name: product.title,
+    nameBn: product.tags?.find((tag: string) => tag.startsWith('bn:'))?.replace('bn:', '') || product.title,
+    price: product.price,
+    unit: product.tags?.find((tag: string) => tag.startsWith('unit:'))?.replace('unit:', '') || 'কেজি',
+    image: images[0]?.url || defaultImg,
+    images: images,
+    descriptionBn: product.description || '',
+    category: product.category?.name || 'General',  
+    isActive: product.status === 'active',
+    sku: '',
+    stock: product.stock !== undefined ? product.stock : 9999,
+    color: [],
+    size: [],
+    status: product.status === 'active' ? 'active' : 'draft',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+};
 
 export const fetchProducts = async (): Promise<Mango[]> => {
   const response = await fetch(`${API_URL}/AllProducts`);

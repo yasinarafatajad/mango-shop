@@ -1,22 +1,33 @@
 .product-details-page {
   animation: animate-in 0.3s ease-out;
   padding-bottom: 40px;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.details-header-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
 }
 
 .details-header {
   position: relative;
-  width: 100vw !important;
+  width: 100%;
   aspect-ratio: 1;
   background: #f5f5f5;
-  max-height: 280px;
+  max-height: 380px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
-.details-image,
-.details-image img {
+.details-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .back-btn-details {
@@ -34,7 +45,8 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   z-index: 10;
 }
-.wish-btn{
+
+.wish-btn {
   position: absolute;
   top: 16px;
   right: 16px;
@@ -49,11 +61,46 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   z-index: 10;
 }
+
+.thumbnails-wrapper {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 0;
+  width: 100%;
+}
+
+.thumbnail-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  flex-shrink: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #f5f5f5;
+}
+
+.thumbnail-btn.active {
+  border-color: var(--primary-green);
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
+.thumbnail-btn:hover {
+  opacity: 0.9;
+}
+
+.thumbnail-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .details-content {
-  padding: 24px;
+  padding: 24px 0;
   background: var(--white);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  margin-top: -24px;
   position: relative;
   z-index: 5;
 }
@@ -189,21 +236,22 @@
     align-items: flex-start;
   }
 
-  .details-header {
+  .details-header-container {
     flex: 1;
+    max-width: 500px;
+  }
+
+  .details-header {
     max-height: 500px;
     border-radius: var(--radius-lg);
-    overflow: hidden;
     box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    background: #fff;
-    aspect-ratio: 1 / 1.1;
+    aspect-ratio: 1 / 1;
   }
 
   .details-content {
     flex: 1.2;
     margin-top: 0;
     padding: 0;
-    border-radius: 0;
     background: transparent;
   }
 
@@ -278,10 +326,15 @@
     transform: scale(1.1);
     background: #fff;
   }
+
+  .thumbnail-btn {
+    width: 70px;
+    height: 70px;
+  }
 }
 
 @media (min-width: 1400px) {
-    .product-details-page {
-        max-width: 1200px;
-    }
+  .product-details-page {
+    max-width: 1200px;
+  }
 }
